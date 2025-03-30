@@ -5,3 +5,8 @@ backend/data/processed/*.csv
 backend/models/content_based/*.pkl
 backend/models/content_based/*.index
 
+backend/data/raw/ratings.csv 
+backend/data/raw/title.basics.tsv 
+backend/models/content_based/bert_embeddings.pkl 
+backend/models/content_based/bert_faiss.index 
+backend/data/processed/clean_ratings.csv 
