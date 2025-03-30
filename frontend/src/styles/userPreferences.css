@@ -1,0 +1,271 @@
+@import "./global.css"; /* Import global styles */
+
+.user-preferences {
+    background-image: url("../components/background2.webp");
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+/* Navbar should be full-width and glued to top */
+.user-preferences .navbar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/*  pink container */
+.preferences-container {
+    background: rgba(193, 39, 121, 0.47); /* Reduced opacity for a faded effect */
+    padding: 30px;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 1300px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    text-align: center;
+    margin-top: 80px;
+}
+
+/* 🔹 Left Section (Image, Review, Button) */
+.left-section {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* 🔹 Cinema image smaller and more rounded */
+.cinema-image {
+    width: 100%;
+    max-width: 270px; /* Smaller image */
+    border-radius: 25px; /* More rounded */
+    margin-bottom: 60px; /* Increased space below image */
+    box-shadow: 9px 9px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* 🔹 Faded black box only for review section */
+.review-box {
+    background: rgba(0, 0, 0, 0.28); /* More faded black */
+    padding: 15px 25px;
+    border-radius: 20px;
+    text-align: center;
+    display: inline-block;
+    box-shadow: 9px 9px 14px rgba(0, 0, 0, 0.6);
+    margin-bottom: 30px; /* Space below the review box */
+    font-size: 25px;
+}
+
+/* 🔹 Review Text */
+.rating-text {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+/* 🔹 Stars */
+.stars { 
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    font-size: 40px; /* Bigger stars */
+    letter-spacing: 7px; /* Add spacing between stars */
+    cursor: pointer;
+}
+
+/* Default star color is black */
+.star {
+    color: black;
+    transition: color 0.3s;
+}
+
+/* Clicked stars turn pink */
+.star.selected {
+    color: #E2ADC7;
+}
+
+/* 🔹 Hover Effect: Stars temporarily turn #E2ADC7 */
+.star:hover,
+.star:hover ~ .star {
+    color: #E2ADC7;
+}
+
+.recommend-button {
+    background-color: black;
+    color: black; /* Default text color */
+    padding: 30px 40px; /* Bigger button */
+    font-size: 25px; /* Bigger text */
+    border: 1.5px solid #E2ADC7; /* Blended color of 20% Pink + 100% Gray */
+    border-radius: 15px; /* Slightly rounded corners */
+    cursor: pointer;
+    margin-top: 30px; /* Increased space above the button */
+    box-shadow: 9px 9px 14px rgba(0, 0, 0, 0.52); /* Bottom-right shadow */
+    font-weight: bold;
+    text-shadow: 1px 1px 6px #E2ADC7; /* Blended color outline */
+    transition: all 0.3s ease-in-out;
+}
+
+/* 🔹 Hover Effect */
+.recommend-button:hover {
+    background-color: #E2ADC7; /* Blended color on hover */
+    color: black;
+    border-color: #FF007F; /* Full pink border on hover */
+}
+
+/* 🔹 Right Section */
+.preferences-right-section {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 🔹 Top Section: Title & Subtitle */
+.preferences-title-section {
+    text-align: center;
+    width: 100%;
+    padding-bottom: 25px;
+}
+
+.preferences-title-section h2 {
+    font-size: 40px;
+    font-weight: bold;
+    color: black; /* Text is black */
+}
+
+.preferences-title-section p {
+    font-size: 20px;
+    color: black; /* Text is black */
+    margin-bottom: 10px;
+}
+
+/* 🔹 Bottom Section: Options Container */
+.preferences-options-container {
+    background: rgba(0, 0, 0, 0.3); /* Faded black */
+    padding: 25px 35px; /* Increased left & right padding */
+    width: 105%; /* Now extends further to the left and right */
+    max-width: 1000px; /* Increased width limit */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    border-top: 3px solid black;
+    border-bottom: 2px solid black;
+}
+
+.input-group {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    background: rgba(0, 0, 0, 0.3); 
+    padding: 10px 15px; 
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    color: #E2ADC7; 
+    font-size: 16px; 
+    text-shadow: 1px 1px 40px black; 
+    margin-right: 15px; 
+}
+
+.input-group select {
+    width: auto;
+    min-width: 180px;
+    padding: 8px;
+    font-size: 14px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.textarea-group {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3); 
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.textarea-group label {
+    color: #E2ADC7;
+    font-size: 16px;
+    text-shadow: 1px 1px 6px black;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.textarea-group textarea {
+    width: 100%;
+    height: 80px; 
+    background: rgba(0, 0, 0, 0.8); 
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: normal;
+    font-family: Arial, sans-serif;
+    resize: none;
+}
+
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-btn {
+    background-color: black;
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    border-radius: 5px;
+}
+
+.dropdown-content {
+    display: block;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.9);
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10; /* Fix dropdown appearing behind elements */
+    top: 100%; /* Ensure it appears below the button */
+}
+
+.dropdown-item {
+    padding: 10px;
+    text-align: left;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover,
+.dropdown-item.selected {
+    background-color: #E2ADC7; /* Pink highlight for selected options */
+    color: black;
+}

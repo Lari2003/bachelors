@@ -1,0 +1,129 @@
+@import "./global.css"; /* Import global styles */
+
+.recommendations-page {
+    background-image: url("../components/background1.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Move content lower */
+    height: 100vh;
+    color: black;
+    padding-top: 80px; /* Add padding to make space for the title */
+}
+
+/* 🔹 Title Styling */
+.page-title {
+    font-size: 38px; /* Larger font size */
+    font-weight: bold;
+    color: black; /* Change title color to black */
+    text-shadow: 2px 2px 8px pink; /* Add shadow for visibility */
+    margin-bottom: 40px; /* Adjust margin */
+    position: relative;
+    z-index: 1;
+    text-align: center; /* Center the title */
+}
+
+/* 🔹 Grid layout for movies */
+.movies-container {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(150px, 1fr)); /* 6 columns */
+    grid-template-rows: repeat(2, auto); /* 2 rows */
+    gap: 20px; /* Adjust gap */
+    width: 85%;
+    max-width: 1400px;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+/* 🔹 Movie card container */
+.movie-card {
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+    background: rgba(0, 0, 0, 0.6); /* Faded black background */
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.8);
+    width: 150px; /* Smaller card width */
+    z-index: 2;
+}
+
+/* 🔹 Movie poster */
+.movie-card img {
+    width: 100%;
+    height: 220px; /* Smaller image height */
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+}
+
+/* 🔹 Title remains outside */
+.movie-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: pink;
+    margin-top: 10px;
+}
+
+/* 🔹 Movie details */
+.movie-details {
+    width: 100%;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
+/* 🔹 Hover effect: Enlarge the card and show details */
+.movie-card:hover {
+    transform: scale(1.15); /* Slightly smaller scale */
+    z-index: 10; /* Bring hovered card to the front */
+}
+
+.movie-card:hover .movie-details {
+    opacity: 1;
+    max-height: 150px;
+}
+
+/* 🔹 Remove duplicated title from details */
+.movie-details .movie-title {
+    display: none;
+}
+
+/* 🔹 Responsive adjustments */
+@media (max-width: 1200px) {
+    .movies-container {
+        grid-template-columns: repeat(4, minmax(150px, 1fr));
+        gap: 30px;
+    }
+}
+
+@media (max-width: 900px) {
+    .movies-container {
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+        gap: 25px;
+    }
+}
+
+@media (max-width: 600px) {
+    .movies-container {
+        grid-template-columns: repeat(2, minmax(130px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .movies-container {
+        grid-template-columns: repeat(1, minmax(120px, 1fr));
+    }
+}

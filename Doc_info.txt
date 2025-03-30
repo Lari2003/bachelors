@@ -1,0 +1,199 @@
+Backend Structure for a Hybrid Recommender
+
+Step 1: Data Collection & Preprocessing
+
+1.1: Use MovieLens Dataset (for Collaborative Filtering)
+-	Dataset: The MovieLens dataset (available from GroupLens Research) contains user ratings and movie metadata, which is excellent for collaborative filtering. You can download it from GroupLens.
+
+1.2: Use IMDb/TMDB API (for Content-Based Filtering)
+-	APIs:
+	-	TMDB API: Provides access to movie metadata (descriptions, genres, etc.). You can sign up and get an API key from The Movie Database.
+	-	IMDb API: You can use the IMDbPY library to fetch movie metadata from IMDb. It's a good source for detailed movie information like actors, directors, genres, and synopses
+
+1.3: Data Preprocessing and Normalization
+-	Data Cleaning: Handle missing data, remove duplicates, and filter out irrelevant data.
+	-	For example, you can remove rows with null ratings or movies without descriptions.
+-	Normalization: Normalize numeric fields like ratings and scores (if needed). A common technique is Min-Max scaling or Z-score normalization
+
+Tools and Libraries:
+-	Pandas: To load, clean, and manipulate data.
+-	requests: To fetch data from the TMDB/IMDb API.
+
+
+for these you can watch : https://www.youtube.com/watch?v=hoObIVgdO6w&list=PLLQAByUENr6jLO3RGUYCWWBY64XFqOf40&index=6
+
+
+
+
+
+
+Step 2: Content-Based Filtering (Movie Similarity)
+
+2.1: Convert Movie Descriptions & Metadata into Numerical Vectors
+-	TF-IDF (Term Frequency-Inverse Document Frequency): This method converts text data into numerical vectors, capturing the importance of words in each document.
+
+	-	Action: Convert movie descriptions into TF-IDF vectors using TfidfVectorizer from the sklearn library.
+-	Word2Vec/BERT: These are more advanced techniques for converting movie descriptions into dense vector representations. BERT (Bidirectional Encoder Representations from Transformers) is particularly useful for understanding the context of words in a description.
+	-	Action: Use pre-trained Word2Vec or BERT models from Hugging Face to generate vector embeddings for movie descriptions.
+
+2.2: Cosine Similarity to Recommend Similar Movies
+-	Cosine Similarity is used to measure the similarity between two vectors (in this case, movie descriptions).
+	-	Action: Calculate the cosine similarity between the vectorized representations of movies to recommend similar movies.
+Tools and Libraries:
+-	scikit-learn: For TF-IDF and calculating cosine similarity.
+-	transformers (Hugging Face): For using BERT model
+
+
+
+
+
+
+
+Step 3: Collaborative Filtering (User Preferences)
+
+3.1: Matrix Factorization (SVD, ALS)
+-	Matrix Factorization techniques like SVD (Singular Value Decomposition) or ALS (Alternating Least Squares) are used for predicting user preferences based on the interaction between users and items (movies).
+	-	Action: Use SVD or ALS to predict missing ratings in the user-item interaction matrix (i.e., a matrix of users and the movies they have rated).
+	-	Libraries:
+		-	Surprise: A popular library for collaborative filtering, including implementations of SVD and ALS.
+		-	TensorFlow/PyTorch: For custom matrix factorization models if required.
+
+3.2: Store User-Item Interaction Data in PostgreSQL/MongoDB
+-	Database: You will store the user-movie ratings and interaction data in a database like PostgreSQL or MongoDB.
+	-	PostgreSQL: A relational database for structured data.
+	-	MongoDB: A NoSQL database that works well for large datasets and can store unstructured data.
+Tools and Libraries:
+-	SQLAlchemy or psycopg2 for interacting with PostgreSQL.
+-	PyMongo for MongoDB.
+
+
+
+
+
+
+
+Step 4: Hybrid Model (Merging Both Approaches)
+
+4.1: Combine Content-Based and Collaborative Scores
+-	Weighted Hybrid Model: One of the simplest methods of combining both models is to assign a weight to each model (e.g., 70% content-based + 30% collaborative).
+	-	Action: Combine the scores from content-based and collaborative models using a weighted sum.
+-	Stacking Model (ML-based Blending): An alternative approach is to use a machine learning model to learn how to blend the results of both approaches. You can use regression or another model to combine the outputs.
+	-	Action: Train a stacking model to blend content-based and collaborative results into a final recommendation.
+-	LLM-based Recommendation (Optional): If you want to add more sophistication, consider using Large Language Models (LLM) like GPT or BERT to generate or refine recommendations.
+
+Tools and Libraries:
+-	scikit-learn: For combining scores using a weighted sum or building stacking models.
+-	Keras/TensorFlow: For creating neural network-based hybrid models.
+
+
+Step 5: Deploying the API (Flask or FastAPI)
+
+5.1: Build a REST API with Flask/FastAPI
+-	Flask or FastAPI will be used to expose the hybrid recommendation model via a REST API.
+	-	Flask: Lightweight and easy to use for building APIs.
+	-	FastAPI: Provides automatic validation, fast performance, and is built for modern applications.
+	Action: Build endpoints that accept user input (e.g., movie preferences, past ratings) and return personalized recommendations.
+
+5.2: Use Redis or Elasticsearch for Fast Lookups
+-	Redis: A key-value store for caching recommendations for faster lookups.
+-	Elasticsearch: A search engine for efficient and scalable querying.
+Action: Implement caching of frequent recommendations using Redis for better performance.
+
+5.3: Deploy on Heroku, AWS Lambda, or Google Cloud
+-	Deployment Platforms:
+	-	Heroku: Simple to use for quick deployment.
+	-	AWS Lambda: For serverless deployment and scalability.
+	-	Google Cloud: Offers powerful AI services and deployment options.
+	Action: Set up CI/CD pipelines and deploy the REST API to a cloud service.
+
+Tools and Libraries:
+-	Docker: For containerizing the application for easy deployment.
+-	Heroku CLI/AWS CLI: For cloud deployment.
+
+
+
+
+
+
+
+
+Bachelor_project/
+│
+├── backend/                         # All backend files and logic (model, API, etc.)
+│   ├── data/
+	├── processed/            # Cleaned and preprocessed data (e.g., CSV files).
+			├── clean_movies.csv
+			├── clean_ratings.csv
+			├── valid_links.csv
+			├── invalid_tmdb_ids.log
+	├── raw/                  # Raw data (MovieLens, IMDb/TMDB data).   https://grouplens.org/datasets/movielens/
+			├── title.basics.tsv
+			├── title.rating.tsv
+			├── links.csv
+			├── movies.csv
+			├── ratings.csv
+  	└── data_preprocessing.py # Script for data cleaning and preprocessing.
+  	└── clean_tmdb_ids.py
+│   ├── models/
+	 ├── collaborative/        # Collaborative filtering models (e.g., SVD, ALS).
+	 ├── content_based/        # Content-based filtering models (e.g., TF-IDF, Word2Vec).
+			├── bert_similarity.py
+			├── tfidf_similarity.py
+			├── hybrid_similarity.py
+			├── bert_embeddings.pkl
+			├── bert_faiss.index
+			├── top_k_bertSimilarities.pkl
+			├── tfidf_embeddings.pkl
+			├── top_k_similarity.pkl
+			├── top_k_similarities_tem
+			├── top_k_similarity_hybrid.pkl
+	 ├── hybrid/               # Hybrid model that merges both content-based and collaborative. 
+ 	 ├── model_utils.py        # Utilities for model evaluation and metrics.
+	 └── train_models.py       # Script to train and evaluate models.
+│   ├── api/
+    	 ├── __init__.py           # Initialize the FastAPI/Flask app.
+	 ├── routes.py             # Define API endpoints for serving recommendations.
+	 └── recommendation.py     # Logic for generating movie recommendations
+│   ├── database/
+	 ├── db.py           	    # Initialize database connection (e.g., PostgreSQL or MongoDB).
+	 ├── db_models.py          # Define database models for storing movie/user interactions.
+	 ├── db_utils.py           # Utilities for interacting with the database.
+	 └── populate_db.py        # Script to populate database with initial data.
+│   ├── requirements.txt
+│   ├── config.py
+│   └── main.py
+│
+└── frontend/  
+	├── node_modules
+	├──src/          
+    		├── components/            # Reusable UI components (e.g., MovieCard, RecommendationList)
+	 		├── background1.webp
+	 		├── background2.webp
+	 		├── cinema_room.webp
+	 		├── auth_box.jpg
+	 		├── navbar.js
+	 		├── person_icon.svg
+	 		├── star_icon.svg
+    		├── pages/    
+	 		├── adminDashboard.js
+	 		├── login.js
+	 		├── register.js
+	 		├── profile.js
+	 		├── recommendations.js
+	 		├── userPreferences.js
+	 		├── notFound.js                   
+    		├── public/                      # Public files like index.html
+	 		├── index.js
+    		├── styles/                      
+	 		├── adminDashboard.css
+	 		├── login.css
+	 		├── register.css
+	 		├── profile.css
+	 		├── recommendations.css
+	 		├── userPreferences.css
+	 		├── notFound.css
+    		├── app.js                       # Main frontend logic (e.g., API calls, dynamic rendering)
+	├── package.json                 # Frontend dependencies
+	├── package-lock.json
+	└── .env                          # Environment variables (e.g., API URL)
+

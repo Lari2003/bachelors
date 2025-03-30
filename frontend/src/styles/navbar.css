@@ -1,0 +1,72 @@
+/* Ensure the navbar layout stays correct */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7); /* 70% Black */
+    padding: 10px 20px;
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* Left Section (Profile Icon) */
+.left-section {
+    display: flex;
+    align-items: center;
+}
+
+/* Profile Icon */
+.profile-icon {
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    filter: drop-shadow(2px 2px 5px rgba(255, 0, 127, 0.2)); /* 20% FF007F Glow */
+    transition: transform 0.3s ease-in-out;
+}
+
+.profile-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Right Section (Login & Register Buttons) */
+.right-section {
+    display: flex;  /* Make sure buttons stay in a row */
+    align-items: center;
+    margin-right: 15px; /* Space between buttons */
+    flex-direction: row; /* Ensure buttons are side by side */
+}
+
+/* Navigation Buttons */
+.nav-button {
+    text-decoration: none;
+    font-family: "Bubblegum Sans", cursive; /* Bubblegum Sans Font */
+    font-size: 16px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.2); /* 20% Black Text */
+    border: 2px solid rgba(255, 0, 128, 0.7); /* 20% FF007F Border */
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-shadow: 1px 1px 2px rgba(255, 0, 128, 0.7); /* Stroke effect */
+    transition: all 0.3s ease-in-out;
+}
+
+/* Hover Effect */
+.nav-button:hover {
+    background-color: rgba(255, 0, 127, 0.2); /* 20% FF007F */
+    color: black;
+}
+
+/* Logout Button */
+.logout {
+    background-color: red;
+    border-color: red;
+    color: white;
+}
+
+.logout:hover {
+    background-color: darkred;
+}

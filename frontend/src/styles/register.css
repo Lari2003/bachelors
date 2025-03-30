@@ -1,0 +1,82 @@
+@import "./global.css"; /* Import global styles */
+
+.register {
+    background-image: url("../components/background1.webp");
+    background-size: cover;  /* Ensures the background covers the entire screen */
+    background-position: center; /* Centers the background */
+    background-repeat: no-repeat; /* Prevents repetition */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw; /* Ensures it spans the full viewport width */
+    overflow: hidden; /* Prevents any extra scrollbars */
+}
+
+
+.register-container {
+    position: relative;
+    width: 500px; /* Adjust as needed */
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-box-image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Ensures image is below the form */
+}
+
+.register-form {
+    position: absolute;
+    z-index: 2; /* Ensures form is above the image */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    padding: 20px;
+    color: pink;
+}
+
+.register-form h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 5px black;
+}
+
+.register-form label {
+    align-self: flex-start;
+    margin: 10px 0 5px;
+    font-size: 17px;
+}
+
+.register-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #E2ADC7;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.register-btn {
+    width: 50%;
+    padding: 10px;
+    margin-top: 15px;
+    background: pink;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 4px 4px 10px black;
+}
+
+.register-btn:hover {
+    background: #E2ADC7;
+}
