@@ -1,0 +1,7 @@
+ # Ignore large dataset files
+backend/data/raw/*.csv
+backend/data/raw/*.tsv
+backend/data/processed/*.csv
+backend/models/content_based/*.pkl
+backend/models/content_based/*.index
+
