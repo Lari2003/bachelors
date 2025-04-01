@@ -121,22 +121,24 @@ Bachelor_project/
 │
 ├── backend/                         # All backend files and logic (model, API, etc.)
 │   ├── data/
-	├── processed/            # Cleaned and preprocessed data (e.g., CSV files).
-			├── clean_movies.csv
-			├── clean_ratings.csv
-			├── valid_links.csv
-			├── invalid_tmdb_ids.log
-	├── raw/                  # Raw data (MovieLens, IMDb/TMDB data).   https://grouplens.org/datasets/movielens/
-			├── title.basics.tsv
-			├── title.rating.tsv
-			├── links.csv
-			├── movies.csv
-			├── ratings.csv
-  	└── data_preprocessing.py # Script for data cleaning and preprocessing.
-  	└── clean_tmdb_ids.py
-│   ├── models/
-	 ├── collaborative/        # Collaborative filtering models (e.g., SVD, ALS).
-	 ├── content_based/        # Content-based filtering models (e.g., TF-IDF, Word2Vec).
+		├── processed/            # Cleaned and preprocessed data (e.g., CSV files).
+				├── clean_movies.csv
+				├── clean_ratings.csv
+				├── valid_links.csv
+				├── invalid_tmdb_ids.log
+		├── raw/                  # Raw data (MovieLens, IMDb/TMDB data).   https://grouplens.org/datasets/movielens/
+				├── title.basics.tsv
+				├── title.rating.tsv
+				├── links.csv
+				├── movies.csv
+				├── ratings.csv
+  		└── data_preprocessing.py # Script for data cleaning and preprocessing.
+  		└── clean_tmdb_ids.py
+    ├── models/
+	 	├── collaborative/        # Collaborative filtering models (e.g., SVD, ALS).
+	 		├── generate_collab_recommendations.py
+			├── train_collaborative.py
+	 	├── content_based/        # Content-based filtering models (e.g., TF-IDF, Word2Vec).
 			├── bert_similarity.py
 			├── tfidf_similarity.py
 			├── hybrid_similarity.py
@@ -147,52 +149,48 @@ Bachelor_project/
 			├── top_k_similarity.pkl
 			├── top_k_similarities_tem
 			├── top_k_similarity_hybrid.pkl
-	 ├── hybrid/               # Hybrid model that merges both content-based and collaborative. 
- 	 ├── model_utils.py        # Utilities for model evaluation and metrics.
-	 └── train_models.py       # Script to train and evaluate models.
-│   ├── api/
-    	 ├── __init__.py           # Initialize the FastAPI/Flask app.
-	 ├── routes.py             # Define API endpoints for serving recommendations.
-	 └── recommendation.py     # Logic for generating movie recommendations
-│   ├── database/
-	 ├── db.py           	    # Initialize database connection (e.g., PostgreSQL or MongoDB).
-	 ├── db_models.py          # Define database models for storing movie/user interactions.
-	 ├── db_utils.py           # Utilities for interacting with the database.
-	 └── populate_db.py        # Script to populate database with initial data.
-│   ├── requirements.txt
-│   ├── config.py
-│   └── main.py
-│
+	 	├── hybrid/               # Hybrid model that merges both content-based and collaborative. 
+ 	 	├── model_utils.py        # Utilities for model evaluation and metrics.
+	 	└── train_models.py       # Script to train and evaluate models.
+	├── venv/
+	├── .env
+	├── requirements.txt
+	├── script.py
 └── frontend/  
 	├── node_modules
 	├──src/          
     		├── components/            # Reusable UI components (e.g., MovieCard, RecommendationList)
-	 		├── background1.webp
-	 		├── background2.webp
-	 		├── cinema_room.webp
-	 		├── auth_box.jpg
-	 		├── navbar.js
-	 		├── person_icon.svg
-	 		├── star_icon.svg
+	 			├── background1.webp
+	 			├── background2.webp
+				├── cinema_room.webp
+				├── auth_box.jpg
+				├── navbar.js
+				├── person_icon.svg
+				├── star_icon.svg
+				├── user_avatar.webp
+				├── background_profile.jpg 
     		├── pages/    
-	 		├── adminDashboard.js
-	 		├── login.js
-	 		├── register.js
-	 		├── profile.js
-	 		├── recommendations.js
-	 		├── userPreferences.js
-	 		├── notFound.js                   
+				├── adminDashboard.js
+				├── login.js
+				├── register.js
+				├── profile.js
+				├── recommendations.js
+				├── userPreferences.js
+				├── notFound.js                   
     		├── public/                      # Public files like index.html
-	 		├── index.js
+	 			├── index.js
     		├── styles/                      
-	 		├── adminDashboard.css
-	 		├── login.css
-	 		├── register.css
-	 		├── profile.css
-	 		├── recommendations.css
-	 		├── userPreferences.css
-	 		├── notFound.css
+				├── adminDashboard.css
+				├── global.css
+				├── navbar.css
+				├── login.css
+				├── register.css
+				├── profile.css
+				├── recommendations.css
+				├── userPreferences.css
+				├── notFound.css
     		├── app.js                       # Main frontend logic (e.g., API calls, dynamic rendering)
+			├── index.js
 	├── package.json                 # Frontend dependencies
 	├── package-lock.json
 	└── .env                          # Environment variables (e.g., API URL)

@@ -1,90 +1,151 @@
-@import "./global.css"; /* Import global styles */
-
-.login {
-    background-image: url("../components/background1.webp");
+/* login.css */
+.login-page {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-}
-
-.login-container {
+    min-height: 100vh;
+    background: url("../components/background1.webp") no-repeat center center/cover;
+    font-family: 'Inter', sans-serif;
+    padding: 2rem;
+  }
+  
+  .login-container {
+    width: 100%;
+    max-width: 560px;
+    min-height: 600px;
+    border-radius: 0px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    background: url("../components/auth_box.jpg") no-repeat center center/cover;
     position: relative;
-    width: 500px; /* Adjust as needed */
-    height: 500px;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.auth-box-image {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Ensures image is below the form */
-}
-
-.login-form {
-    position: absolute;
-    z-index: 2; /* Ensures form is above the image */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  }
+  
+  .login-form {
     width: 80%;
-    padding: 20px;
-    color: pink;
-}
-
-.login-form h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    text-shadow: 2px 2px 5px black;
-
-}
-
-.login-form label {
-    align-self: flex-start;
-    margin: 10px 0 5px;
-    font-size: 17px;
-    
-}
-
-.login-form input {
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+  }
+  
+  .login-form h2 {
+    color: #2D2D2D;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #E2ADC7;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.8);
-}
-
-.forgot-password {
-    align-self: flex-end;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.forgot-password a {
-    color: pink;
-    text-decoration: none;
-}
-
-.login-btn {
-    width: 50%;
-    padding: 10px;
-    margin-top: 15px;
-    background: pink;
+    padding: 1rem;
+    border: 2px solid #EDEDED;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #FFFFFF;
+    transition: all 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: #C12779;
+    box-shadow: 0 3px 15px rgba(193, 39, 121, 0.1);
+  }
+  
+  .form-group input::placeholder {
+    color: #A0A0A0;
+  }
+  
+  .error-message {
+    color: #D45395;
+    background: #FFF0F5;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #FFD1E0;
+    text-align: center;
+  }
+  
+  .login-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #C12779, #D45395);
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
     border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: bold;
     cursor: pointer;
-    box-shadow: 4px 4px 10px black;
-
-}
-
-.login-btn:hover {
-    background: #E2ADC7;
-}
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+  }
+  
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(193, 39, 121, 0.3);
+  }
+  
+  .login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .register-redirect {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #6B6B6B;
+    font-size: 0.95rem;
+  }
+  
+  .register-redirect a {
+    color: #C12779;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  
+  .register-redirect a:hover {
+    color: #A02060;
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .login-container {
+      min-height: 500px;
+      max-width: 90%;
+    }
+  
+    .login-form {
+      width: 90%;
+      padding: 2rem;
+    }
+  
+    .login-form h2 {
+      font-size: 1.75rem;
+    }
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .loading-spinner {
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+    margin-right: 0.5rem;
+  }

@@ -1,33 +1,83 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import "../styles/navbar.css"; // Import the CSS file for styles
-import personIcon from "../components/person_icon.svg"; // Profile icon
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import '../styles/navbar.css';
+import personIcon from './person_icon.svg';
 
-const Navbar = ({ isLoggedIn, handleLogout }) => {
+const Navbar = ({ isAuthenticated, userData, setIsAuthenticated }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setSidebarOpen(false);
+    navigate('/');
+  };
+
   return (
     <nav className="navbar">
-      {/* Left Section (Profile Icon if logged in) */}
-      <div className="left-section">
-        {isLoggedIn && (
-          <Link to="/profile">
-            <img src={personIcon} alt="Profile" className="profile-icon" />
-          </Link>
-        )}
-      </div>
+      <div className="navbar-container">
+        <Link to="/" className="navbar-brand">MovieRec</Link>
+        
+        <div className="profile-container">
+          <div className="profile-icon" onClick={toggleSidebar}>
+            <img src={personIcon} alt="Profile" />
+          </div>
 
-      {/* Right Section (Buttons) */}
-      <div className="right-section">
-        {!isLoggedIn ? (
-          <>
-            <Link to="/login" className="nav-button">Login</Link>
-            <Link to="/register" className="nav-button">Register</Link>
-          </>
-        ) : (
-          <>
-            <Link to="/recommendations" className="nav-button">Recommendations</Link>
-            <button className="nav-button logout" onClick={handleLogout}>Logout</button>
-          </>
-        )}
+          <div className={`profile-sidebar ${sidebarOpen ? 'active' : ''}`}>
+            <div className="sidebar-content">
+              {isAuthenticated ? (
+                <div className="user-profile">
+                  <img 
+                    src={userData?.avatar || personIcon} 
+                    alt="User" 
+                    className="user-avatar" 
+                  />
+                  <h3>{userData?.name || 'User'}</h3>
+                  <p>{userData?.email || ''}</p>
+                  <Link 
+                    to="/profile" 
+                    className="profile-btn edit"
+                    onClick={closeSidebar}
+                  >
+                    View Profile
+                  </Link>
+                  <button 
+                    className="profile-btn logout"
+                    onClick={handleLogout}
+                  >
+                    Log Out
+                  </button>
+                </div>
+              ) : (
+                <div className="auth-options">
+                  <h3>Welcome</h3>
+                  <Link 
+                    to="/login" 
+                    className="auth-btn login"
+                    onClick={closeSidebar}
+                  >
+                    Log In
+                  </Link>
+                  <div className="divider">or</div>
+                  <Link 
+                    to="/register" 
+                    className="auth-btn register"
+                    onClick={closeSidebar}
+                  >
+                    Create Account
+                  </Link>
+                </div>
+              )}
+            </div>
+            <button className="sidebar-close" onClick={closeSidebar}>
+              ×
+            </button>
+          </div>
+        </div>
       </div>
     </nav>
   );

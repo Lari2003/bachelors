@@ -1,37 +1,46 @@
-@import "./global.css"; /* Import global styles */
-
+/* src/styles/navbar.css */
 .navbar {
-    width: 100%;
+    background: rgba(193, 39, 121, 0.8); /* Your pink color */
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     position: fixed;
     top: 0;
-    left: 0;
+    width: 100%;
     z-index: 1000;
-}
-
-.profile-page {
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .navbar-brand {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .profile-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
     display: flex;
+    align-items: center;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-}
-
-/* Centered Profile Container */
-.profile-container {
-    max-width: 1000px;
-    height: auto;
-    background-image: url("../components/auth_box.jpg"); /* ✅ Set background */
-    background-size: cover; /* Ensures it covers the whole container */
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 200px;
-    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.8);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-icon:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+  }
+  
+  .profile-icon img {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
+  }

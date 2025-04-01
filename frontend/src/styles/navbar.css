@@ -1,72 +1,159 @@
-/* Ensure the navbar layout stays correct */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.7); /* 70% Black */
-    padding: 10px 20px;
-    height: 60px;
-    width: 100%;
+    background: rgba(15, 15, 20, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 1rem 2rem;
     position: fixed;
     top: 0;
     left: 0;
+    width: 100%;
     z-index: 1000;
-}
-
-/* Left Section (Profile Icon) */
-.left-section {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .navbar-brand {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .profile-container {
+    position: relative;
+  }
+  
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
-}
-
-/* Profile Icon */
-.profile-icon {
-    width: 35px;
-    height: 35px;
+    justify-content: center;
     cursor: pointer;
-    filter: drop-shadow(2px 2px 5px rgba(255, 0, 127, 0.2)); /* 20% FF007F Glow */
-    transition: transform 0.3s ease-in-out;
-}
-
-.profile-icon:hover {
-    transform: scale(1.1);
-}
-
-/* Right Section (Login & Register Buttons) */
-.right-section {
-    display: flex;  /* Make sure buttons stay in a row */
-    align-items: center;
-    margin-right: 15px; /* Space between buttons */
-    flex-direction: row; /* Ensure buttons are side by side */
-}
-
-/* Navigation Buttons */
-.nav-button {
-    text-decoration: none;
-    font-family: "Bubblegum Sans", cursive; /* Bubblegum Sans Font */
-    font-size: 16px;
-    font-weight: bold;
-    color: rgba(0, 0, 0, 0.2); /* 20% Black Text */
-    border: 2px solid rgba(255, 0, 128, 0.7); /* 20% FF007F Border */
-    padding: 8px 15px;
-    border-radius: 20px;
-    text-shadow: 1px 1px 2px rgba(255, 0, 128, 0.7); /* Stroke effect */
-    transition: all 0.3s ease-in-out;
-}
-
-/* Hover Effect */
-.nav-button:hover {
-    background-color: rgba(255, 0, 127, 0.2); /* 20% FF007F */
-    color: black;
-}
-
-/* Logout Button */
-.logout {
-    background-color: red;
-    border-color: red;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .profile-icon img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .profile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 350px;
+    height: 100vh;
+    background: rgba(20, 20, 25, 0.98);
+    backdrop-filter: blur(15px);
+    border-left: 1px solid rgba(226, 173, 199, 0.2);
+    transition: right 0.3s ease;
+    z-index: 1001;
+  }
+  
+  .profile-sidebar.active {
+    right: 0;
+  }
+  
+  .sidebar-content {
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  .sidebar-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
     color: white;
-}
-
-.logout:hover {
-    background-color: darkred;
-}
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  .user-profile, .auth-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #E2ADC7;
+  }
+  
+  .profile-btn, .auth-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-btn.edit, .auth-btn.login {
+    background: linear-gradient(135deg, #E2ADC7, #C12779);
+    color: white;
+  }
+  
+  .profile-btn.logout, .auth-btn.register {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .profile-btn:hover, .auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .divider {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: rgba(255, 255, 255, 0.3);
+    margin: 1rem 0;
+  }
+  
+  .divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .divider::before {
+    margin-right: 0.5rem;
+  }
+  
+  .divider::after {
+    margin-left: 0.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .profile-sidebar {
+      width: 100%;
+      right: -100%;
+    }
+    
+    .profile-sidebar.active {
+      right: 0;
+    }
+  }

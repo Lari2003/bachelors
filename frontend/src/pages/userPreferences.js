@@ -1,126 +1,307 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
 import "../styles/userPreferences.css";
-import cinemaRoom from "../components/cinema_room.webp"; // Import the image
+import cinemaRoom from "../components/cinema_room.webp";
 
 const UserPreferences = () => {
   const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [selectedMovies, setSelectedMovies] = useState([]);
+  const [yearPreference, setYearPreference] = useState("");
+  const [ageRating, setAgeRating] = useState("");
+  const [plotDescription, setPlotDescription] = useState("");
+  const [ratingThreshold, setRatingThreshold] = useState("");
+  const [showGenreDropdown, setShowGenreDropdown] = useState(false);
+  const [showMovieDropdown, setShowMovieDropdown] = useState(false);
+  const [isButtonAnimated, setIsButtonAnimated] = useState(false);
 
   // Dropdown options
   const genres = ["Adventure", "Action", "Animation", "Comedy", "Crime", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller", "Western"];
   const years = ["Last year", "Last 5 years", "Last 10 years", "Older"];
   const ageRatings = ["Teens(13+)", "Mature(16+)", "Adults(18+)", "All ages"];
   const ratingThresholds = ["1 star", "2 stars", "3 stars", "4 stars", "5 stars"];
+  
+  // Sample movie list
+  const popularMovies = [
+    "The Shawshank Redemption", "The Godfather", "Pulp Fiction", 
+    "The Dark Knight", "Forrest Gump", "Inception", 
+    "The Matrix", "Goodfellas", "Fight Club",
+    "Interstellar", "The Lord of the Rings", "Star Wars",
+    "Jurassic Park", "Avatar", "Titanic"
+  ];
 
   const handleRating = (index) => {
     setRating(index + 1);
   };
 
+  const handleHoverRating = (index) => {
+    setHoverRating(index + 1);
+  };
+
+  const toggleGenre = (genre, e) => {
+    if (e) e.stopPropagation();
+    
+    if (selectedGenres.includes(genre)) {
+      setSelectedGenres(selectedGenres.filter(g => g !== genre));
+    } else if (selectedGenres.length < 5) {
+      setSelectedGenres([...selectedGenres, genre]);
+    }
+  };
+
+  const toggleMovie = (movie, e) => {
+    if (e) e.stopPropagation();
+    
+    if (selectedMovies.includes(movie)) {
+      setSelectedMovies(selectedMovies.filter(m => m !== movie));
+    } else if (selectedMovies.length < 10) {
+      setSelectedMovies([...selectedMovies, movie]);
+    }
+  };
+
+  const handleRecommendClick = () => {
+    setIsButtonAnimated(true);
+    setTimeout(() => setIsButtonAnimated(false), 500);
+    
+    console.log({
+      rating,
+      selectedGenres,
+      selectedMovies,
+      yearPreference,
+      ageRating,
+      plotDescription,
+      ratingThreshold
+    });
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const isGenreDropdownClick = event.target.closest('.genre-dropdown');
+      const isMovieDropdownClick = event.target.closest('.movie-dropdown');
+      
+      if (!isGenreDropdownClick && showGenreDropdown) {
+        setShowGenreDropdown(false);
+      }
+      
+      if (!isMovieDropdownClick && showMovieDropdown) {
+        setShowMovieDropdown(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showGenreDropdown, showMovieDropdown]);
+
   return (
     <div className="page user-preferences">
       <Navbar />
 
-      {/* Pink Container */}
       <div className="preferences-container">
-        
-        {/* 🔹 Left Section: Image, Review Box, Button */}
+        {/* Left Section */}
         <div className="left-section">
-          <img src={cinemaRoom} alt="Cinema Room" className="cinema-image" />
+          <div className="cinema-image-container">
+            <img src={cinemaRoom} alt="Cinema Room" className="cinema-image" />
+          </div>
           
-          {/* 🔹 Only the review text and stars inside faded box */}
           <div className="review-box">
-            <p className="rating-text">Rate us like a blockbuster movie - 5 stars, please!</p>
+            <p className="rating-text">Rate us like a blockbuster movie!</p>
             <div className="stars">
               {[...Array(5)].map((_, index) => (
                 <span
                   key={index}
-                  className={`star ${index < rating ? "selected" : ""}`}
+                  className={`star ${index < (hoverRating || rating) ? "selected" : ""}`}
                   onClick={() => handleRating(index)}
+                  onMouseEnter={() => handleHoverRating(index)}
+                  onMouseLeave={() => setHoverRating(0)}
                 >
                   ★
                 </span>
               ))}
             </div>
+            {rating > 0 && (
+              <p className="rating-feedback">
+                {rating === 5 ? "Amazing! Thank you!" : 
+                 rating === 4 ? "Great! We appreciate it!" :
+                 rating === 3 ? "Thanks for your feedback!" :
+                 rating === 2 ? "We'll try to improve!" :
+                 "We'll work harder to impress you!"}
+              </p>
+            )}
           </div>
 
-          <button className="recommend-button">Recommend Movies</button>
+          <button 
+            className={`recommend-button ${isButtonAnimated ? 'pulse' : ''} ${selectedGenres.length > 0 ? 'active' : ''}`}
+            onClick={handleRecommendClick}
+          >
+            Recommend Movies
+          </button>
         </div>
 
-        {/* 🔹 Right Section */}
+        {/* Right Section */}
         <div className="preferences-right-section">
-          
-          {/* 🔹 Title Section */}
           <div className="preferences-title-section">
             <h2>WELCOME TO BINGE VIBE</h2>
-            <p>Get ready to be recommended the best movies</p>
+            <p>Get ready to discover your next favorite movies</p>
           </div>
 
-          {/* 🔹 Options Section inside a faded black box */}
           <div className="preferences-options-container">
-
-            {/* 🔹 Select up to five preferred genres */}
+            {/* Genres Dropdown */}
             <div className="input-group">
               <label>Select up to five preferred genres</label>
-              <select>
-                <option>Choose options</option>
-                {genres.map((genre, index) => (
-                  <option key={index} value={genre}>{genre}</option>
-                ))}
-              </select>
+              <div 
+                className={`custom-dropdown genre-dropdown ${showGenreDropdown ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowGenreDropdown(!showGenreDropdown);
+                  setShowMovieDropdown(false);
+                }}
+              >
+                <button className="dropdown-btn">
+                  {selectedGenres.length > 0 
+                    ? `${selectedGenres.length} genre${selectedGenres.length > 1 ? 's' : ''} selected` 
+                    : "Choose genres"}
+                </button>
+                {showGenreDropdown && (
+                  <div className="dropdown-content">
+                    {genres.map((genre, index) => (
+                      <div 
+                        key={index} 
+                        className={`dropdown-item ${selectedGenres.includes(genre) ? 'selected' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleGenre(genre, e);
+                        }}
+                      >
+                        {genre}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* 🔹 Choose up to ten movies you have watched and enjoyed (Generated later) */}
+            {selectedGenres.length > 0 && (
+              <div className="selected-items">
+                {selectedGenres.map((genre, index) => (
+                  <span key={index} className="selected-tag">
+                    {genre}
+                    <button onClick={(e) => {
+                      e.stopPropagation();
+                      toggleGenre(genre);
+                    }}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Movies Dropdown */}
             <div className="input-group">
               <label>Choose up to ten movies you have watched and enjoyed</label>
-              <select>
-                <option>Choose options</option>
-                {/* Future dynamically generated options */}
-              </select>
+              <div 
+                className={`custom-dropdown movie-dropdown ${showMovieDropdown ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMovieDropdown(!showMovieDropdown);
+                  setShowGenreDropdown(false);
+                }}
+              >
+                <button className="dropdown-btn">
+                  {selectedMovies.length > 0 
+                    ? `${selectedMovies.length} movie${selectedMovies.length > 1 ? 's' : ''} selected` 
+                    : "Choose movies"}
+                </button>
+                {showMovieDropdown && (
+                  <div className="dropdown-content">
+                    {popularMovies.map((movie, index) => (
+                      <div 
+                        key={index} 
+                        className={`dropdown-item ${selectedMovies.includes(movie) ? 'selected' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleMovie(movie, e);
+                        }}
+                      >
+                        {movie}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* 🔹 Specify the release years */}
+            {selectedMovies.length > 0 && (
+              <div className="selected-items">
+                {selectedMovies.map((movie, index) => (
+                  <span key={index} className="selected-tag">
+                    {movie}
+                    <button onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMovie(movie);
+                    }}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Other form elements */}
             <div className="input-group">
               <label>Specify the release years</label>
-              <select>
-                <option>Choose options</option>
+              <select 
+                value={yearPreference}
+                onChange={(e) => setYearPreference(e.target.value)}
+                className="select-input"
+              >
+                <option value="">Choose option</option>
                 {years.map((year, index) => (
                   <option key={index} value={year}>{year}</option>
                 ))}
               </select>
             </div>
 
-            {/* 🔹 Set an age rating preference */}
             <div className="input-group">
               <label>Set an age rating preference</label>
-              <select>
-                <option>Choose options</option>
+              <select 
+                value={ageRating}
+                onChange={(e) => setAgeRating(e.target.value)}
+                className="select-input"
+              >
+                <option value="">Choose option</option>
                 {ageRatings.map((rating, index) => (
                   <option key={index} value={rating}>{rating}</option>
                 ))}
               </select>
             </div>
 
-            {/* 🔹 Describe your ideal movie plot */}
             <div className="textarea-group">
               <label>Describe your ideal movie plot in a few sentences</label>
-              <textarea placeholder="Enter text"></textarea>
+              <textarea 
+                placeholder="For example: An unlikely hero embarks on an adventure..."
+                value={plotDescription}
+                onChange={(e) => setPlotDescription(e.target.value)}
+                maxLength="200"
+              ></textarea>
+              <div className="character-count">
+                {plotDescription.length}/200 characters
+              </div>
             </div>
 
-            {/* 🔹 Set a minimum rating threshold */}
             <div className="input-group">
               <label>Set a minimum rating threshold</label>
-              <select>
-                <option>Choose options</option>
+              <select 
+                value={ratingThreshold}
+                onChange={(e) => setRatingThreshold(e.target.value)}
+                className="select-input"
+              >
+                <option value="">Choose option</option>
                 {ratingThresholds.map((threshold, index) => (
                   <option key={index} value={threshold}>{threshold}</option>
                 ))}
               </select>
             </div>
-
           </div>
-
         </div>
-
       </div>
     </div>
   );
