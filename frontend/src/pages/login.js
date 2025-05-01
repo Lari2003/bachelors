@@ -1,9 +1,7 @@
-// login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
-import { auth } from "../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import axios from "axios"; // Import axios for making HTTP requests
 
 const Login = ({ setIsAuthenticated, setUserData }) => {
   const [formData, setFormData] = useState({
@@ -16,7 +14,7 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -25,26 +23,29 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
     setIsLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-
-      setIsAuthenticated(true);
-      setUserData({
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-      navigate('/');
-    } catch (error) {
-      let errorMessage = "An error occurred during login";
-      if (error.code === "auth/invalid-credential") {
-        errorMessage = "Invalid email or password";
-      } else if (error.code === "auth/too-many-requests") {
-        errorMessage = "Too many attempts. Please try again later";
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setUserData({
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          avatar: data.user.avatar,
+        });
+        navigate("/");
+      } else {
+        setError(data.error || "An error occurred during login");
       }
-      setError(errorMessage);
+    } catch (err) {
+      setError("An error occurred during login");
     } finally {
       setIsLoading(false);
     }

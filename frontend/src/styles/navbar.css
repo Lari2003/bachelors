@@ -157,3 +157,75 @@
       right: 0;
     }
   }
+
+  .profile-icon img.user-avatar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #E2ADC7;
+  }
+  
+  /* Quick action links */
+  .quick-actions {
+    margin-top: 1.5rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .quick-actions a {
+    display: block;
+    padding: 0.6rem;
+    background: rgba(226, 173, 199, 0.1);
+    border-radius: 4px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  
+  .quick-actions a:hover {
+    background: rgba(226, 173, 199, 0.2);
+    transform: translateY(-1px);
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .quick-actions {
+      margin-top: 1rem;
+    }
+    
+    .quick-actions a {
+      padding: 0.5rem;
+    }
+  }
+
+  .avatar-upload-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    cursor: pointer;
+  }
+  
+  .avatar-upload-container:hover .user-avatar {
+    filter: brightness(0.8);
+  }
+  
+  .upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    font-size: 0.8rem;
+  }

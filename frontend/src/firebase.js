@@ -3,7 +3,6 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// Your Firebase config (use the one you provided)
 const firebaseConfig = {
   apiKey: "AIzaSyAA7Q7fx6TyEZCN-0xUEGWzgTZ9g7DJr0A",
   authDomain: "movierecommender-4cd88.firebaseapp.com",

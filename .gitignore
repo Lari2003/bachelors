@@ -10,3 +10,16 @@ backend/data/raw/title.basics.tsv
 backend/models/content_based/bert_embeddings.pkl 
 backend/models/content_based/bert_faiss.index 
 backend/data/processed/clean_ratings.csv 
+
+# Frontend ignores
+frontend/node_modules/
+frontend/.cache/
+frontend/.env
+
+# Python ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env

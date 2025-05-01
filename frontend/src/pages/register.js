@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/register.css";
-import authBox from "../components/auth_box.jpg";
-import { auth, db } from "../firebase";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import authBox from "../components/auth_box.jpg";  // If needed
+// Removed Firebase imports
+// import { auth, db } from "../firebase"; 
 
 const Register = ({ setIsAuthenticated, setUserData }) => {
   const [formData, setFormData] = useState({
@@ -42,42 +41,37 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
     setIsLoading(true);
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-
-      await sendEmailVerification(userCredential.user);
-
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        name: formData.name,
-        email: formData.email,
-        createdAt: new Date()
+      // Make a POST request to your backend to register the user
+      const response = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+        }),
       });
 
-      setIsAuthenticated(true);
-      setUserData({
-        uid: userCredential.user.uid,
-        name: formData.name,
-        email: formData.email
-      });
-      
-      navigate('/');
-    } catch (error) {
-      let errorMessage = "An error occurred during registration";
-      
-      if (error.code === "auth/email-already-in-use") {
-        errorMessage = "This email address is already registered";
-      } else if (error.code === "auth/invalid-email") {
-        errorMessage = "Please enter a valid email address";
-      } else if (error.code === "auth/weak-password") {
-        errorMessage = "Password is too weak. Please choose a stronger password";
-      } else if (error.message) {
-        errorMessage = error.message;
+      const data = await response.json();
+
+      if (response.ok) {
+        // After successful registration, set user data and authentication status
+        setIsAuthenticated(true);
+        setUserData({
+          uid: data.user.id, // MongoDB does not have a `uid` field like Firebase
+          name: formData.name,
+          email: formData.email,
+          avatar: data.user.avatar || "",  // Assume avatar URL is included in the response
+        });
+        
+        navigate("/");
+      } else {
+        setError(data.error || "An error occurred during registration");
       }
-      
-      setError(errorMessage);
+    } catch (error) {
+      setError("An error occurred during registration");
     } finally {
       setIsLoading(false);
     }

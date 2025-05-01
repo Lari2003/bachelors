@@ -6,6 +6,9 @@ import random
 from dotenv import load_dotenv
 from tqdm.asyncio import tqdm
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+import json
+from hashlib import md5
+import datetime
 
 # ✅ Load API Key
 load_dotenv()
@@ -15,12 +18,19 @@ if not TMDB_API_KEY:
     print("🚨 ERROR: API key is missing or invalid. Check your .env file!")
     exit(1)
 
-# ✅ Define Paths
-RAW_DATA_PATH = "backend/data/raw/"
-PROCESSED_DATA_PATH = "backend/data/processed/"
+# ✅ Define Paths FIRST --------------------------------------------------------
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Script's directory
+RAW_DATA_PATH = os.path.join(current_dir, "raw")
+PROCESSED_DATA_PATH = os.path.join(current_dir, "processed")
+
+# File paths using the above directories
 LINKS_FILE = os.path.join(RAW_DATA_PATH, "links.csv")
 CLEAN_MOVIES_FILE = os.path.join(PROCESSED_DATA_PATH, "clean_movies.csv")
+CLEAN_RATINGS_FILE = os.path.join(PROCESSED_DATA_PATH, "clean_ratings.csv")  # Added
+INVALID_IDS_LOG = os.path.join(PROCESSED_DATA_PATH, "invalid_tmdb_ids.log")
+VALID_LINKS_FILE = os.path.join(PROCESSED_DATA_PATH, "valid_links.csv")
 
+# ✅ Ensure processed folder exists
 os.makedirs(PROCESSED_DATA_PATH, exist_ok=True)
 
 # ✅ Load links.csv
@@ -32,33 +42,45 @@ tmdb_ids = links["tmdbId"].tolist()
 
 # ✅ Define Fetching Function with Rate Limit Handling
 async def fetch_movie_details(session, tmdb_id):
-    """Fetch movie details from TMDb API with rate-limiting & retries."""
-    url = f"https://api.themoviedb.org/3/movie/{int(tmdb_id)}?api_key={TMDB_API_KEY}&language=en-US"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    """Fetch movie details from TMDb API with proper validation"""
+    url = f"https://api.themoviedb.org/3/movie/{int(tmdb_id)}?api_key={TMDB_API_KEY}"
+    headers = {"User-Agent": f"MyApp/1.0 ({os.getenv('CONTACT_EMAIL', '')})"}
+    
+    try:
+        async with session.get(url, headers=headers, timeout=10) as response:
+            if response.status == 200:
+                data = await response.json()
+                return {
+                    "tmdbId": tmdb_id,
+                    "valid": True,
+                    "description": data.get("overview", ""),
+                    "year": data.get("release_date", "")[:4] if data.get("release_date") else None
+                }
+            elif response.status == 404:
+                # Log invalid ID immediately
+                with open(INVALID_IDS_LOG, "a") as f:
+                    f.write(f"{tmdb_id}\n")
+                return {"tmdbId": tmdb_id, "valid": False}
+            else:
+                return {"tmdbId": tmdb_id, "valid": False}
+    except Exception as e:
+        print(f"🚨 Error validating {tmdb_id}: {str(e)}")
+        return {"tmdbId": tmdb_id, "valid": False}
 
-    for attempt in range(5):  # Retry up to 5 times with exponential backoff
-        try:
-            async with session.get(url, headers=headers, timeout=15) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    return {"tmdbId": tmdb_id, "description": data.get("overview", "")}
-                elif response.status == 404:
-                    return None  # Skip missing movies
-                elif response.status == 429:  # Rate limit hit
-                    wait_time = 2 ** attempt  # Exponential backoff
-                    print(f"⏳ Rate limited (429) for {tmdb_id}, retrying in {wait_time} sec...")
-                    await asyncio.sleep(wait_time)
-                else:
-                    print(f"⚠️ TMDb ID {tmdb_id} failed (Status: {response.status})")
-                    return None
-        except asyncio.TimeoutError:
-            print(f"⏳ Timeout for {tmdb_id}, retrying...")
-            await asyncio.sleep(2 ** attempt)  # Exponential backoff
-        except aiohttp.ClientError as e:
-            print(f"🚨 Network error for {tmdb_id}: {e}, retrying...")
-            await asyncio.sleep(2 ** attempt)
-
-    return None  # Return None if all retries fail
+def generate_metadata(movies_df, ratings_path):
+    """Generate dataset metadata and checksums"""
+    metadata = {
+        "version": datetime.datetime.now().isoformat(),
+        "num_movies": int(len(movies_df)),
+        "num_valid_tmdb": int(movies_df["valid_tmdb"].sum()),
+        "checksum": md5(pd.util.hash_pandas_object(movies_df).values).hexdigest(),
+        "ratings_checksum": md5(open(ratings_path, "rb").read()).hexdigest()
+    }
+    
+    metadata_path = os.path.join(PROCESSED_DATA_PATH, "clean_metadata.json")
+    with open(metadata_path, "w") as f:
+        json.dump(metadata, f, indent=2)
+    print(f"📊 Metadata saved to {metadata_path}")
 
 # ✅ Process TMDb IDs in Batches with Concurrency Control
 async def process_tmdb_movies():
@@ -108,7 +130,14 @@ if __name__ == "__main__":
     # ✅ Merge Descriptions with Movies
     movies = movies.merge(descriptions_df, on="tmdbId", how="left")
 
+    generate_metadata(movies, CLEAN_RATINGS_FILE) 
+
     # ✅ Save Updated Movies Data
     movies.to_csv(CLEAN_MOVIES_FILE, index=False)
+
+    # ✅ Save valid TMDb links
+    valid_links = links[links["tmdbId"].isin(descriptions_df[descriptions_df["valid"] == True]["tmdbId"])]
+    valid_links.to_csv(VALID_LINKS_FILE, index=False)
+    print(f"✅ Valid links saved at {VALID_LINKS_FILE}")
 
     print(f"\n✅ Movie descriptions added! Updated dataset saved at {CLEAN_MOVIES_FILE}.")

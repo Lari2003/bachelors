@@ -8,35 +8,53 @@ import Recommendations from "./pages/recommendations";
 import AdminDashboard from "./pages/adminDashboard";
 import NotFound from "./pages/notFound";
 import Navbar from "./components/navbar";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Check authentication status on app load
+  // Firebase auth state listener
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Verify token and fetch user data
-      fetchUserData(token);
-    }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // User is signed in
+        const token = await user.getIdToken();
+        
+        // Set authentication state
+        setIsAuthenticated(true);
+        setUserData({
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || 'User', // Fallback if no name
+          avatar: user.photoURL || './person_icon.svg' // Fallback avatar
+        });
+        
+        // Store token if needed for backend
+        localStorage.setItem('token', token);
+      } else {
+        // User is signed out
+        setIsAuthenticated(false);
+        setUserData(null);
+        localStorage.removeItem('token');
+      }
+      setLoading(false);
+    });
+
+    // Cleanup subscription
+    return () => unsubscribe();
   }, []);
 
-  const fetchUserData = async (token) => {
-    try {
-      // Replace with your actual API call
-      const response = await fetch('/api/user', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setIsAuthenticated(true);
-        setUserData(data.user);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <Router>

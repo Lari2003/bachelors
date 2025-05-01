@@ -155,3 +155,88 @@
   animation: spin 0.6s linear infinite;
   margin-right: 0.5rem;
 }
+
+/* Profile sections */
+.profile-section {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.profile-section h4 {
+  color: #E2ADC7;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Quick actions */
+.quick-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.quick-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-btn:hover {
+  background: rgba(226, 173, 199, 0.2);
+}
+
+.sidebar-content {
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-section {
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.sidebar-section.hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .quick-actions {
+    flex-direction: column;
+  }
+}
