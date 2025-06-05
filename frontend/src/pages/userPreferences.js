@@ -8,6 +8,7 @@ const UserPreferences = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
+  const [genreBasedMovies, setGenreBasedMovies] = useState([]);
   const [yearPreference, setYearPreference] = useState("");
   const [ageRating, setAgeRating] = useState("");
   const [plotDescription, setPlotDescription] = useState("");
@@ -21,15 +22,6 @@ const UserPreferences = () => {
   const years = ["Last year", "Last 5 years", "Last 10 years", "Older"];
   const ageRatings = ["Teens(13+)", "Mature(16+)", "Adults(18+)", "All ages"];
   const ratingThresholds = ["1 star", "2 stars", "3 stars", "4 stars", "5 stars"];
-  
-  // Sample movie list
-  const popularMovies = [
-    "The Shawshank Redemption", "The Godfather", "Pulp Fiction", 
-    "The Dark Knight", "Forrest Gump", "Inception", 
-    "The Matrix", "Goodfellas", "Fight Club",
-    "Interstellar", "The Lord of the Rings", "Star Wars",
-    "Jurassic Park", "Avatar", "Titanic"
-  ];
 
   const handleRating = (index) => {
     setRating(index + 1);
@@ -62,37 +54,69 @@ const UserPreferences = () => {
   const handleRecommendClick = () => {
     setIsButtonAnimated(true);
     setTimeout(() => setIsButtonAnimated(false), 500);
-    
-    console.log({
-      rating,
-      selectedGenres,
-      selectedMovies,
-      yearPreference,
-      ageRating,
-      plotDescription,
-      ratingThreshold
-    });
+  
+    const payload = {
+      plot: plotDescription,
+      genres: selectedGenres,
+      years: yearPreference,
+      age_rating: ageRating,
+      rating_threshold: ratingThreshold
+    };
+  
+    console.log("📤 Sending request with payload:", payload);
+  
+    fetch("http://localhost:5000/api/recommend-by-plot", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("🎬 Recommended movies:", data.recommendations);
+        localStorage.setItem("recommendations", JSON.stringify(data.recommendations));
+        window.location.href = "/recommendations"; // redirect to show results
+      })
+      .catch((err) => {
+        console.error("❌ Failed to fetch recommendations", err);
+      });
   };
+  
+  
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      const isGenreDropdownClick = event.target.closest('.genre-dropdown');
-      const isMovieDropdownClick = event.target.closest('.movie-dropdown');
-      
-      if (!isGenreDropdownClick && showGenreDropdown) {
-        setShowGenreDropdown(false);
-      }
-      
-      if (!isMovieDropdownClick && showMovieDropdown) {
-        setShowMovieDropdown(false);
-      }
-    };
-    
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [showGenreDropdown, showMovieDropdown]);
+    if (selectedGenres.length > 0) {
+      fetch(`http://localhost:5000/api/popular-movies?${selectedGenres.map(g => `genres=${encodeURIComponent(g)}`).join("&")}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log("🎬 Movies fetched:", data.movies);
+          setGenreBasedMovies(data.movies || []);
+          setSelectedMovies([]);
+        })
+        .catch(err => console.error("Failed to fetch genre-based movies", err));
+    } else {
+      setGenreBasedMovies([]);
+      setSelectedMovies([]);
+    }
+  }, [selectedGenres]);
+  
+
+  //Fetch movies when genres change
+  useEffect(() => {
+    if (selectedGenres.length > 0) {
+      fetch(`/api/popular-movies?${selectedGenres.map(g => `genres=${encodeURIComponent(g)}`).join("&")}`)
+        .then(res => res.json())
+        .then(data => {
+          setGenreBasedMovies(data.movies || []);
+          setSelectedMovies([]); // Reset selected movies when genres change
+        })
+        .catch(err => console.error("Failed to fetch genre-based movies", err));
+    } else {
+      setGenreBasedMovies([]);
+      setSelectedMovies([]);
+    }
+  }, [selectedGenres]);
 
   return (
     <div className="page user-preferences">
@@ -213,21 +237,25 @@ const UserPreferences = () => {
                     : "Choose movies"}
                 </button>
                 {showMovieDropdown && (
-                  <div className="dropdown-content">
-                    {popularMovies.map((movie, index) => (
-                      <div 
-                        key={index} 
-                        className={`dropdown-item ${selectedMovies.includes(movie) ? 'selected' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleMovie(movie, e);
-                        }}
-                      >
-                        {movie}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <div className="dropdown-content">
+                  {genreBasedMovies.length === 0 && (
+                    <p style={{ color: "white", padding: "10px" }}>⚠️ No movies loaded</p>
+                  )}
+                  {genreBasedMovies.map((movie, index) => (
+                    <div 
+                      key={index} 
+                      className={`dropdown-item ${selectedMovies.includes(movie) ? 'selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleMovie(movie, e);
+                      }}
+                    >
+                      {movie}
+                    </div>
+                  ))}
+                </div>
+              )}
+
               </div>
             </div>
 

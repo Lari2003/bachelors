@@ -50,13 +50,15 @@ after_filtering = len(movies)
 print(f"📉 Movies after filtering for valid TMDb ID and year: {after_filtering} (removed {before_filtering - after_filtering})")
 
 # ✅ Convert to non-nullable integers after filtering
+movies = movies[movies["tmdbId"].notna()]
 movies["tmdbId"] = movies["tmdbId"].astype("int64")
+movies["valid_tmdb"] = True
 movies["year"] = movies["year"].astype("int64")
- 
+
 # ✅ Fetch metadata from TMDb and merge
 print("🌐 Fetching metadata from TMDb for valid movies...")
 metadata = fetch_and_cache_tmdb_metadata(movies)
-movies = movies.merge(metadata, on="tmdbId", how="left")
+movies = pd.merge(movies, metadata, on="tmdbId", how="left", suffixes=('', '_meta'))
 
 # ✅ Schema Validation (AFTER metadata is included)
 schema_errors = validate_schema(movies, MOVIES_SCHEMA)
