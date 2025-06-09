@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
 import "../styles/userPreferences.css";
 import cinemaRoom from "../components/cinema_room.webp";
+import { db } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { auth } from "../firebase";
 
 const UserPreferences = () => {
   const [rating, setRating] = useState(0);
@@ -17,7 +20,6 @@ const UserPreferences = () => {
   const [showMovieDropdown, setShowMovieDropdown] = useState(false);
   const [isButtonAnimated, setIsButtonAnimated] = useState(false);
 
-  // Dropdown options
   const genres = ["Adventure", "Action", "Animation", "Comedy", "Crime", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller", "Western"];
   const years = ["Last year", "Last 5 years", "Last 10 years", "Older"];
   const ageRatings = ["Teens(13+)", "Mature(16+)", "Adults(18+)", "All ages"];
@@ -33,7 +35,6 @@ const UserPreferences = () => {
 
   const toggleGenre = (genre, e) => {
     if (e) e.stopPropagation();
-    
     if (selectedGenres.includes(genre)) {
       setSelectedGenres(selectedGenres.filter(g => g !== genre));
     } else if (selectedGenres.length < 5) {
@@ -43,7 +44,6 @@ const UserPreferences = () => {
 
   const toggleMovie = (movie, e) => {
     if (e) e.stopPropagation();
-    
     if (selectedMovies.includes(movie)) {
       setSelectedMovies(selectedMovies.filter(m => m !== movie));
     } else if (selectedMovies.length < 10) {
@@ -51,46 +51,66 @@ const UserPreferences = () => {
     }
   };
 
-  const handleRecommendClick = () => {
+  const handleRecommendClick = async () => {
     setIsButtonAnimated(true);
     setTimeout(() => setIsButtonAnimated(false), 500);
-  
+
     const payload = {
       plot: plotDescription,
       genres: selectedGenres,
       years: yearPreference,
       age_rating: ageRating,
-      rating_threshold: ratingThreshold
+      rating_threshold: ratingThreshold,
+      selected_movies: selectedMovies
     };
-  
-    console.log("📤 Sending request with payload:", payload);
-  
-    fetch("http://localhost:5000/api/recommend-by-plot", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("🎬 Recommended movies:", data.recommendations);
-        localStorage.setItem("recommendations", JSON.stringify(data.recommendations));
-        window.location.href = "/recommendations"; // redirect to show results
-      })
-      .catch((err) => {
-        console.error("❌ Failed to fetch recommendations", err);
+
+    const user = auth.currentUser;
+
+    if (user) {
+      try {
+        await setDoc(doc(db, "users", user.uid, "preferences", "latest"), {
+          ...payload,
+          timestamp: new Date()
+        });
+      } catch (err) {
+        console.error("❌ Failed to save preferences to Firestore:", err);
+      }
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/recommend-by-plot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
+
+      const data = await res.json();
+
+      if (user) {
+        try {
+          const timestamp = Date.now().toString();
+          await setDoc(doc(db, "users", user.uid, "history", timestamp), {
+            preferences: payload,
+            recommendations: data.recommendations,
+            timestamp: new Date()
+          });
+        } catch (err) {
+          console.error("❌ Failed to save recommendation history:", err);
+        }
+      }
+
+      localStorage.setItem("recommendations", JSON.stringify(data.recommendations));
+      window.location.href = "/recommendations";
+    } catch (err) {
+      console.error("❌ Failed to fetch recommendations:", err);
+    }
   };
-  
-  
 
   useEffect(() => {
     if (selectedGenres.length > 0) {
       fetch(`http://localhost:5000/api/popular-movies?${selectedGenres.map(g => `genres=${encodeURIComponent(g)}`).join("&")}`)
         .then(res => res.json())
         .then(data => {
-          console.log("🎬 Movies fetched:", data.movies);
           setGenreBasedMovies(data.movies || []);
           setSelectedMovies([]);
         })
@@ -100,16 +120,14 @@ const UserPreferences = () => {
       setSelectedMovies([]);
     }
   }, [selectedGenres]);
-  
 
-  //Fetch movies when genres change
   useEffect(() => {
     if (selectedGenres.length > 0) {
       fetch(`/api/popular-movies?${selectedGenres.map(g => `genres=${encodeURIComponent(g)}`).join("&")}`)
         .then(res => res.json())
         .then(data => {
           setGenreBasedMovies(data.movies || []);
-          setSelectedMovies([]); // Reset selected movies when genres change
+          setSelectedMovies([]);
         })
         .catch(err => console.error("Failed to fetch genre-based movies", err));
     } else {

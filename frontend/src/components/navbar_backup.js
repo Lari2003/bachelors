@@ -11,10 +11,6 @@ const Navbar = ({ isAuthenticated, userData, setIsAuthenticated }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  if (typeof isAuthenticated === "undefined" || userData === undefined) {
-    return null;
-  }
-
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const closeSidebar = () => setSidebarOpen(false);
 
@@ -33,18 +29,18 @@ const Navbar = ({ isAuthenticated, userData, setIsAuthenticated }) => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">MovieRec</Link>
-
+        
         <div className="profile-container">
-          <div
-            className="profile-icon"
+          <div 
+            className="profile-icon" 
             onClick={toggleSidebar}
             aria-label="User menu"
             aria-expanded={sidebarOpen}
             role="button"
           >
-            <img
-              src={isAuthenticated ? (userData?.avatar || personIcon) : personIcon}
-              alt="Profile"
+            <img 
+              src={isAuthenticated ? (userData?.avatar || personIcon) : personIcon} 
+              alt="Profile" 
               className={isAuthenticated && userData?.avatar ? 'user-avatar-icon' : ''}
               onError={(e) => {
                 e.target.src = personIcon;
@@ -55,39 +51,46 @@ const Navbar = ({ isAuthenticated, userData, setIsAuthenticated }) => {
 
           <div className={`profile-sidebar ${sidebarOpen ? 'active' : ''}`}>
             <div className="sidebar-content">
-              {sidebarOpen && typeof isAuthenticated !== "undefined" && (
-                isAuthenticated && userData ? (
-                  <SidebarProfile
-                    userData={userData}
-                    onClose={closeSidebar}
-                    onLogout={handleLogout}
-                  />
-                ) : (
-                  <div className="auth-options">
-                    <h3>Welcome</h3>
-                    <Link
-                      to="/login"
-                      className="auth-btn login"
-                      onClick={closeSidebar}
-                      state={{ from: window.location.pathname }}
-                    >
-                      Log In
-                    </Link>
-                    <div className="divider">or</div>
-                    <Link
-                      to="/register"
-                      className="auth-btn register"
-                      onClick={closeSidebar}
-                    >
-                      Create Account
-                    </Link>
-                  </div>
-                )
-              )}
+            {isAuthenticated === true && userData ? (
+              <>
+                <SidebarProfile 
+                  userData={userData}
+                  onClose={closeSidebar}
+                  onLogout={handleLogout}
+                />
+                <div className="quick-actions">
+                  <Link to="/recommendations" className="quick-btn" onClick={closeSidebar}>
+                    My Recommendations
+                  </Link>
+                  <Link to="/preferences" className="quick-btn" onClick={closeSidebar}>
+                    Preferences
+                  </Link>
+                </div>
+              </>
+            ) : isAuthenticated === false ? (
+              <div className="auth-options">
+                <h3>Welcome</h3>
+                <Link 
+                  to="/login" 
+                  className="auth-btn login"
+                  onClick={closeSidebar}
+                  state={{ from: window.location.pathname }}
+                >
+                  Log In
+                </Link>
+                <div className="divider">or</div>
+                <Link 
+                  to="/register" 
+                  className="auth-btn register"
+                  onClick={closeSidebar}
+                >
+                  Create Account
+                </Link>
+              </div>
+            ) : null}
             </div>
-
-            <button
-              className="sidebar-close"
+            <button 
+              className="sidebar-close" 
               onClick={closeSidebar}
               aria-label="Close menu"
             >

@@ -84,7 +84,8 @@ def recommend_movies_from_plot(user_input):
             "title": str(movie["title"]),
             "genres": str(movie["genres"]),
             "year": int(movie["year"]),
-            "description": str(movie["description"])
+            "description": str(movie["description"]),
+            "poster": movie.get("poster_url", "")
         })
 
     return recommendations

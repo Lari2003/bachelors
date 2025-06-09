@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
-import axios from "axios"; // Import axios for making HTTP requests
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const Login = ({ setIsAuthenticated, setUserData }) => {
   const [formData, setFormData] = useState({
@@ -21,31 +23,43 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
+  
     try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        setIsAuthenticated(true);
-        setUserData({
-          id: data.user.id,
-          name: data.user.name,
-          email: data.user.email,
-          avatar: data.user.avatar,
-        });
-        navigate("/");
-      } else {
-        setError(data.error || "An error occurred during login");
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+  
+      const user = userCredential.user;
+      let userData = {};
+  
+      // ACTUALLY FETCH USER DATA FROM FIRESTORE
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          userData = userDoc.data();
+        }
+      } catch (firestoreError) {
+        console.error("Firestore error:", firestoreError);
       }
+  
+      setIsAuthenticated(true);
+      setUserData({
+        id: user.uid,
+        email: user.email,
+        name: userData.name || user.displayName || "User",
+        avatar: userData.avatar || user.photoURL || null
+      });
+  
+      navigate("/");
     } catch (err) {
-      setError("An error occurred during login");
+      console.error("Firebase login error:", err.code, err.message);
+      setError(
+        err.code === "auth/invalid-credential" 
+          ? "Invalid email or password" 
+          : "Login failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -56,9 +70,9 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
       <div className="login-container">
         <form className="login-form" onSubmit={handleSubmit}>
           <h2>WELCOME BACK</h2>
-          
+
           {error && <div className="error-message">{error}</div>}
-          
+
           <div className="form-group">
             <input
               type="email"
@@ -70,7 +84,7 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <input
               type="password"
@@ -82,15 +96,11 @@ const Login = ({ setIsAuthenticated, setUserData }) => {
               required
             />
           </div>
-          
-          <button 
-            type="submit" 
-            className="login-btn"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Logging In...' : 'SIGN IN'}
+
+          <button type="submit" className="login-btn" disabled={isLoading}>
+            {isLoading ? "Logging In..." : "SIGN IN"}
           </button>
-          
+
           <div className="register-redirect">
             Don't have an account? <a href="/register">Create account</a>
           </div>

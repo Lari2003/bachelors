@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/register.css";
-import authBox from "../components/auth_box.jpg";  // If needed
-// Removed Firebase imports
-// import { auth, db } from "../firebase"; 
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const Register = ({ setIsAuthenticated, setUserData }) => {
   const [formData, setFormData] = useState({
@@ -41,36 +41,31 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
     setIsLoading(true);
 
     try {
-      // Make a POST request to your backend to register the user
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-        }),
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      const user = userCredential.user;
+
+      // Save additional data (like name) to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: formData.name,
+        email: user.email,
+        avatar: ""
       });
 
-      const data = await response.json();
+      setIsAuthenticated(true);
+      setUserData({
+        id: user.uid,
+        name: formData.name,
+        email: user.email,
+        avatar: ""
+      });
 
-      if (response.ok) {
-        // After successful registration, set user data and authentication status
-        setIsAuthenticated(true);
-        setUserData({
-          uid: data.user.id, // MongoDB does not have a `uid` field like Firebase
-          name: formData.name,
-          email: formData.email,
-          avatar: data.user.avatar || "",  // Assume avatar URL is included in the response
-        });
-        
-        navigate("/");
-      } else {
-        setError(data.error || "An error occurred during registration");
-      }
-    } catch (error) {
+      navigate("/");
+    } catch (err) {
       setError("An error occurred during registration");
     } finally {
       setIsLoading(false);
@@ -82,9 +77,9 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
       <div className="register-container">
         <form className="register-form" onSubmit={handleSubmit}>
           <h2>CREATE ACCOUNT</h2>
-          
+
           {error && <div className="error-message">{error}</div>}
-          
+
           <div className="form-group">
             <label htmlFor="name">Full Name</label>
             <input
@@ -97,7 +92,7 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input
@@ -110,7 +105,7 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -124,7 +119,7 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
               minLength="6"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
@@ -138,7 +133,7 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
               minLength="6"
             />
           </div>
-          
+
           <button 
             type="submit" 
             className="register-btn"
@@ -151,7 +146,7 @@ const Register = ({ setIsAuthenticated, setUserData }) => {
               </>
             ) : 'GET STARTED NOW'}
           </button>
-          
+
           <div className="register-redirect">
             Already have an account? <a href="/login">Log in</a>
           </div>
