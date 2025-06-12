@@ -49,7 +49,7 @@ This structure and process demonstrate foundational data engineering and analyti
 ### 🔹 Login Page
 ![Login Page](frontend/public/screenshots/login_page.png)
 ### 🔹 Register Page
-![Create Account](frontend/public/screenshots/create_account.png)
+![Create Account](frontend/public/screenshots/create_account_page.png)
 ### 🔹 User Preferences
 ![User Preferences](frontend/public/screenshots/User_preferences&sidebar_profile_page.png)
 ### 🔹 Recommendations Page
