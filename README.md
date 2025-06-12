@@ -47,15 +47,19 @@ This structure and process demonstrate foundational data engineering and analyti
 ## 💡 Screenshots
 
 ### 🔹 Login Page
-
+![Login Page](frontend/public/screenshots/login_page.png)
 ### 🔹 Register Page
-
+![Register Page](frontend/public/screenshots/create_account.png)
 ### 🔹 User Preferences
-
+![User Preferences](frontend/public/screenshots/User_preferences&sidebar_profile_page.png)
 ### 🔹 Recommendations Page
-
+![Login Page](frontend/public/screenshots/login.png)
+![Login Page](frontend/public/screenshots/login.png)
 ### 🔹 Admin Dashboard
-
+![Admin Dashboard General](frontend/public/screenshots/admin_dashboard_general_page.png)
+![Manage Movies](frontend/public/screenshots/Manage_moviespng)
+![Manage Users](frontend/public/screenshots/Manage_users.png)
+![Admin Dashboard ](frontend/public/screenshots/admin.png)
 
 ---
 
