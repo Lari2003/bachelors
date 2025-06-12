@@ -3,7 +3,7 @@ import Navbar from "../components/navbar";
 import "../styles/userPreferences.css";
 import cinemaRoom from "../components/cinema_room.webp";
 import { db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs } from "firebase/firestore";
 import { auth } from "../firebase";
 
 const UserPreferences = () => {
@@ -19,11 +19,37 @@ const UserPreferences = () => {
   const [showGenreDropdown, setShowGenreDropdown] = useState(false);
   const [showMovieDropdown, setShowMovieDropdown] = useState(false);
   const [isButtonAnimated, setIsButtonAnimated] = useState(false);
+  const [userMovieLists, setUserMovieLists] = useState({ liked: [], disliked: [] });
 
   const genres = ["Adventure", "Action", "Animation", "Comedy", "Crime", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller", "Western"];
   const years = ["Last year", "Last 5 years", "Last 10 years", "Older"];
   const ageRatings = ["Teens(13+)", "Mature(16+)", "Adults(18+)", "All ages"];
   const ratingThresholds = ["1 star", "2 stars", "3 stars", "4 stars", "5 stars"];
+
+  // Fetch user's liked and disliked movies
+  const fetchUserMovieLists = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const [likedSnapshot, dislikedSnapshot] = await Promise.all([
+        getDocs(collection(db, "users", user.uid, "liked_movies")),
+        getDocs(collection(db, "users", user.uid, "disliked_movies"))
+      ]);
+
+      const liked = likedSnapshot.docs.map(doc => doc.data().movie_id);
+      const disliked = dislikedSnapshot.docs.map(doc => doc.data().movie_id);
+
+      setUserMovieLists({ liked, disliked });
+    } catch (error) {
+      console.error("Failed to fetch user movie lists:", error);
+    }
+  };
+
+  // Load user movie lists on component mount
+  useEffect(() => {
+    fetchUserMovieLists();
+  }, []);
 
   const handleRating = (index) => {
     setRating(index + 1);
@@ -61,7 +87,12 @@ const UserPreferences = () => {
       years: yearPreference,
       age_rating: ageRating,
       rating_threshold: ratingThreshold,
-      selected_movies: selectedMovies
+      selected_movies: selectedMovies,
+      // Include user's liked and disliked movies to exclude from recommendations
+      exclude_movies: {
+        liked: userMovieLists.liked,
+        disliked: userMovieLists.disliked
+      }
     };
 
     const user = auth.currentUser;
@@ -109,21 +140,6 @@ const UserPreferences = () => {
   useEffect(() => {
     if (selectedGenres.length > 0) {
       fetch(`http://localhost:5000/api/popular-movies?${selectedGenres.map(g => `genres=${encodeURIComponent(g)}`).join("&")}`)
-        .then(res => res.json())
-        .then(data => {
-          setGenreBasedMovies(data.movies || []);
-          setSelectedMovies([]);
-        })
-        .catch(err => console.error("Failed to fetch genre-based movies", err));
-    } else {
-      setGenreBasedMovies([]);
-      setSelectedMovies([]);
-    }
-  }, [selectedGenres]);
-
-  useEffect(() => {
-    if (selectedGenres.length > 0) {
-      fetch(`/api/popular-movies?${selectedGenres.map(g => `genres=${encodeURIComponent(g)}`).join("&")}`)
         .then(res => res.json())
         .then(data => {
           setGenreBasedMovies(data.movies || []);
@@ -190,7 +206,7 @@ const UserPreferences = () => {
 
           <div className="preferences-options-container">
             {/* Genres Dropdown */}
-            <div className="input-group">
+            <div className="input-group" style={{ position: "relative", zIndex: showGenreDropdown ? 300 : "auto" }}>
               <label>Select up to five preferred genres</label>
               <div 
                 className={`custom-dropdown genre-dropdown ${showGenreDropdown ? 'active' : ''}`}
@@ -239,7 +255,8 @@ const UserPreferences = () => {
             )}
 
             {/* Movies Dropdown */}
-            <div className="input-group">
+            <div className="input-group" 
+            style={{ position: "relative", zIndex: showGenreDropdown ? 100 : "auto" }}>
               <label>Choose up to ten movies you have watched and enjoyed</label>
               <div 
                 className={`custom-dropdown movie-dropdown ${showMovieDropdown ? 'active' : ''}`}

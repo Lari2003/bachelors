@@ -1,6 +1,6 @@
 import "./styles/global.css";
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import UserPreferences from "./pages/userPreferences"; 
@@ -12,6 +12,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
+import ManageUsers from "./pages/ManageUsers";
+import ManageMovies from "./pages/ManageMovies";
 
 // Optional test: ensure Firestore connection works
 getDocs(collection(db, "test"))
@@ -22,7 +24,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
@@ -41,7 +43,6 @@ function App() {
             let userDoc = await getDoc(userDocRef);
 
             if (!userDoc.exists()) {
-              // Auto-create Firestore user doc
               await setDoc(userDocRef, {
                 email: user.email,
                 name: basicUserData.name,
@@ -53,16 +54,18 @@ function App() {
               console.log("✨ Created user document in Firestore");
             }
 
-            setUserData({
+            const fullUserData = {
               ...basicUserData,
               ...userDoc.data()
-            });
+            };
+
+            setUserData(fullUserData);
+            setIsAuthenticated(true);
           } catch (firestoreError) {
             console.warn("⚠️ Firestore error, using fallback user data:", firestoreError);
             setUserData(basicUserData);
+            setIsAuthenticated(true);
           }
-
-          setIsAuthenticated(true);
         } else {
           console.log("❌ No user logged in");
           setIsAuthenticated(false);
@@ -80,6 +83,13 @@ function App() {
     return unsubscribe;
   }, []);
 
+  // ✅ Safe redirect to admin
+  useEffect(() => {
+    if (!loading && isAuthenticated && userData?.isAdmin && window.location.pathname === "/") {
+      window.location.href = "/admin";
+    }
+  }, [loading, isAuthenticated, userData]);
+
   if (loading) {
     return (
       <div className="loading-screen">
@@ -91,7 +101,7 @@ function App() {
 
   return (
     <Router>
-      {!loading && (
+      {!loading && isAuthenticated && !userData?.isAdmin && (
         <Navbar 
           isAuthenticated={isAuthenticated} 
           userData={userData}
@@ -103,53 +113,60 @@ function App() {
         <Route 
           path="/" 
           element={
-            loading ? null : (
-              isAuthenticated ? 
-                <UserPreferences userData={userData} /> : 
-                <Navigate to="/login" replace />
-            )
+            isAuthenticated ? 
+              <UserPreferences userData={userData} /> : 
+              <Navigate to="/login" replace />
           } 
         />
         <Route 
           path="/login" 
           element={
-            loading ? null : (
-              !isAuthenticated ? 
-                <Login setIsAuthenticated={setIsAuthenticated} setUserData={setUserData} /> : 
-                <Navigate to="/" replace />
-            )
+            !isAuthenticated ? 
+              <Login setIsAuthenticated={setIsAuthenticated} setUserData={setUserData} /> : 
+              <Navigate to="/" replace />
           } 
         />
         <Route 
           path="/register" 
           element={
-            loading ? null : (
-              !isAuthenticated ? 
-                <Register setIsAuthenticated={setIsAuthenticated} setUserData={setUserData} /> : 
-                <Navigate to="/" replace />
-            )
+            !isAuthenticated ? 
+              <Register setIsAuthenticated={setIsAuthenticated} setUserData={setUserData} /> : 
+              <Navigate to="/" replace />
           } 
         />
         <Route 
           path="/recommendations" 
           element={
-            loading ? null : (
-              isAuthenticated ? 
-                <Recommendations userData={userData} /> : 
-                <Navigate to="/login" state={{ from: "/recommendations" }} replace />
-            )
+            isAuthenticated ? 
+              <Recommendations userData={userData} /> : 
+              <Navigate to="/login" state={{ from: "/recommendations" }} replace />
           } 
         />
         <Route 
           path="/admin" 
           element={
-            loading ? null : (
-              isAuthenticated && userData?.isAdmin ? 
-                <AdminDashboard /> : 
-                <Navigate to="/" replace />
-            )
+            isAuthenticated && userData?.isAdmin ? 
+              <AdminDashboard /> : 
+              <Navigate to="/" replace />
           } 
         />
+        <Route 
+          path="/admin/users" 
+          element={
+            isAuthenticated && userData?.isAdmin ? 
+              <ManageUsers /> : 
+              <Navigate to="/" replace />
+          } 
+        />
+        <Route 
+          path="/admin/movies" 
+          element={
+            isAuthenticated && userData?.isAdmin ? 
+              <ManageMovies /> : 
+              <Navigate to="/" replace />
+          } 
+        />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

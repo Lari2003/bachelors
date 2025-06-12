@@ -9,9 +9,11 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-width: 1300px;
     padding: 100px 20px 40px;
     flex-direction: column;
     position: relative;
+    overflow-y: auto;
 }
 
 .user-preferences::before {
@@ -43,7 +45,8 @@
     box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.7);
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    align-items: stretch;
     justify-content: space-between;
     position: relative;
     z-index: 1;
@@ -370,7 +373,7 @@
 .custom-dropdown {
     position: relative;
     min-width: 180px;
-    z-index: 10; /* Ensure dropdowns stay above other content */
+    z-index: 200; /* Ensure dropdowns stay above other content */
 }
 
 .dropdown-content {
@@ -382,12 +385,17 @@
     overflow-y: auto;
     border-radius: 8px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
-    z-index: 100; /* Higher z-index to ensure it appears above everything */
+    z-index: 999; /* Higher z-index to ensure it appears above everything */
     border: 1px solid rgba(226, 173, 199, 0.5);
     margin-top: 5px;
     animation: fadeIn 0.2s;
     display: none;
 }
+
+.movie-dropdown {
+    z-index: 1;
+    position: relative;
+  }  
 
 .custom-dropdown.active .dropdown-content {
     display: block;
@@ -478,15 +486,17 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
     .preferences-container {
-        flex-direction: column;
-        align-items: center;
-        padding: 18px;
+        flex-direction: row;
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        min-width: 1300px; 
     }
     
     .left-section, .preferences-right-section {
-        width: 100%;
+        width: 50%;
+        max-width: 50%;
         padding-right: 0;
-        margin-bottom: 20px;
+        margin-bottom: 0;
     }
     
     .cinema-image-container, .review-box {
@@ -553,4 +563,5 @@
     .dropdown-item {
         padding: 10px 12px; /* Slightly less padding on small screens */
     }
+      
 }

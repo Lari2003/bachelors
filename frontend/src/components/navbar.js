@@ -32,7 +32,7 @@ const Navbar = ({ isAuthenticated, userData, setIsAuthenticated }) => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-brand">MovieRec</Link>
+        <Link to="/" className="navbar-brand">Binge Vibe</Link>
 
         <div className="profile-container">
           <div
