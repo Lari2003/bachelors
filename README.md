@@ -47,7 +47,7 @@ This structure and process demonstrate foundational data engineering and analyti
 ## 💡 Screenshots
 
 ### 🔹 Login Page
-
+/home/larisa/Desktop/bachelor_project/bachelors/frontend/public/screenshots/login_page.png
 ### 🔹 Register Page
 
 ### 🔹 User Preferences
