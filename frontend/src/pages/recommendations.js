@@ -28,15 +28,15 @@ const Recommendations = () => {
         }
 
         let recommendedMovies = JSON.parse(storedRecommendations);
-        console.log(`📥 Found ${recommendedMovies.length} stored recommendations`);
+        console.log(` Found ${recommendedMovies.length} stored recommendations`);
 
         // If user is logged in, filter out previously rated movies
         if (auth.currentUser) {
-          console.log("👤 User logged in, filtering based on feedback...");
+          console.log(" User logged in, filtering based on feedback...");
           
           // Get all user feedback
           const userFeedbackIds = await getUserFeedbackIds();
-          console.log(`🚫 User has rated ${userFeedbackIds.length} movies previously`);
+          console.log(` User has rated ${userFeedbackIds.length} movies previously`);
           
           // Filter out movies user has already rated
           if (userFeedbackIds.length > 0) {
@@ -44,11 +44,11 @@ const Recommendations = () => {
             recommendedMovies = recommendedMovies.filter(movie => 
               !userFeedbackIds.includes(movie.movie_id)
             );
-            console.log(`✅ Filtered from ${originalCount} to ${recommendedMovies.length} movies`);
+            console.log(` Filtered from ${originalCount} to ${recommendedMovies.length} movies`);
             
             // If we filtered out too many movies, get fresh recommendations
             if (recommendedMovies.length < 15) {
-              console.log(`🔄 Only ${recommendedMovies.length} movies left, fetching fresh recommendations...`);
+              console.log(` Only ${recommendedMovies.length} movies left, fetching fresh recommendations...`);
               recommendedMovies = await getFreshRecommendations(userFeedbackIds);
             }
           }
@@ -56,7 +56,7 @@ const Recommendations = () => {
           // Load existing feedback for remaining movies
           await loadUserFeedback(recommendedMovies);
         } else {
-          console.log("👤 User not logged in, showing all recommendations");
+          console.log(" User not logged in, showing all recommendations");
         }
 
         setMovies(recommendedMovies);
@@ -121,7 +121,7 @@ const Recommendations = () => {
       }
 
       const data = await response.json();
-      console.log(`✅ Got ${data.movies.length} fresh recommendations from backend`);
+      console.log(` Got ${data.movies.length} fresh recommendations from backend`);
       
       // Update localStorage with new recommendations
       localStorage.setItem("recommendations", JSON.stringify(data.movies));
@@ -170,7 +170,7 @@ const Recommendations = () => {
           delete updated[movie.movie_id];
           return updated;
         });
-        console.log(`🗑️ Removed ${status} for ${movie.title}`);
+        console.log(` Removed ${status} for ${movie.title}`);
       } else {
         // Add or update feedback
         await setDoc(feedbackRef, {
@@ -189,7 +189,7 @@ const Recommendations = () => {
           [movie.movie_id]: status
         }));
         
-        console.log(`✅ Saved ${status} for ${movie.title}`);
+        console.log(` Saved ${status} for ${movie.title}`);
         
         // Replace this movie with a new one to maintain list size
         await replaceRatedMovie(movie.movie_id);
@@ -233,7 +233,7 @@ const Recommendations = () => {
             return [...filtered, newMovie];
           });
           
-          console.log(`✅ Replaced rated movie with: ${newMovie.title}`);
+          console.log(` Replaced rated movie with: ${newMovie.title}`);
         } else {
           console.log("No replacement movie available");
           // Just remove the rated movie if no replacement found
@@ -275,8 +275,8 @@ const Recommendations = () => {
         <div className="no-movies-container">
           <p className="no-movies-message">
             {auth.currentUser 
-              ? "🎉 You've rated all our recommendations! Please refresh the page for fresh picks."
-              : "⚠️ No recommendations available. Please go back and select preferences."
+              ? " You've rated all our recommendations! Please refresh the page for fresh picks."
+              : " No recommendations available. Please go back and select preferences."
             }
           </p>
         </div>

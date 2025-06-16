@@ -10,7 +10,7 @@ import json
 from hashlib import md5
 import datetime
 
-# ✅ Load API Key
+#  Load API Key
 load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "").strip()
 
@@ -18,7 +18,7 @@ if not TMDB_API_KEY:
     print("🚨 ERROR: API key is missing or invalid. Check your .env file!")
     exit(1)
 
-# ✅ Define Paths FIRST --------------------------------------------------------
+#  Define Paths FIRST --------------------------------------------------------
 current_dir = os.path.dirname(os.path.abspath(__file__))  # Script's directory
 RAW_DATA_PATH = os.path.join(current_dir, "raw")
 PROCESSED_DATA_PATH = os.path.join(current_dir, "processed")
@@ -30,17 +30,17 @@ CLEAN_RATINGS_FILE = os.path.join(PROCESSED_DATA_PATH, "clean_ratings.csv")  # A
 INVALID_IDS_LOG = os.path.join(PROCESSED_DATA_PATH, "invalid_tmdb_ids.log")
 VALID_LINKS_FILE = os.path.join(PROCESSED_DATA_PATH, "valid_links.csv")
 
-# ✅ Ensure processed folder exists
+#  Ensure processed folder exists
 os.makedirs(PROCESSED_DATA_PATH, exist_ok=True)
 
-# ✅ Load links.csv
+#  Load links.csv
 print("🔍 Loading MovieLens TMDb IDs...")
 links = pd.read_csv(LINKS_FILE)
 links["tmdbId"] = pd.to_numeric(links["tmdbId"], errors="coerce").astype("Int64")
 links = links[links["tmdbId"].notna() & (links["tmdbId"] != 0)]
 tmdb_ids = links["tmdbId"].tolist()
 
-# ✅ Define Fetching Function with Rate Limit Handling
+# Define Fetching Function with Rate Limit Handling
 async def fetch_movie_details(session, tmdb_id):
     """Fetch movie details from TMDb API with proper validation"""
     url = f"https://api.themoviedb.org/3/movie/{int(tmdb_id)}?api_key={TMDB_API_KEY}"
@@ -82,7 +82,7 @@ def generate_metadata(movies_df, ratings_path):
         json.dump(metadata, f, indent=2)
     print(f"📊 Metadata saved to {metadata_path}")
 
-# ✅ Process TMDb IDs in Batches with Concurrency Control
+#  Process TMDb IDs in Batches with Concurrency Control
 async def process_tmdb_movies():
     batch_size = 500  # Reduce batch size to avoid rate limits
     concurrency_limit = 5  # Reduce concurrency to avoid overloading TMDb API
@@ -117,27 +117,27 @@ async def main():
 if __name__ == "__main__":
     movie_descriptions = asyncio.run(main())
 
-    # ✅ Convert to DataFrame
+    #  Convert to DataFrame
     descriptions_df = pd.DataFrame(movie_descriptions)
 
-    # ✅ Load Clean Movies Data
+    #  Load Clean Movies Data
     movies = pd.read_csv(CLEAN_MOVIES_FILE)
     
-    # ✅ Ensure correct data types
+    #  Ensure correct data types
     movies["tmdbId"] = movies["tmdbId"].astype("Int64")
     descriptions_df["tmdbId"] = descriptions_df["tmdbId"].astype("Int64")
 
-    # ✅ Merge Descriptions with Movies
+    #  Merge Descriptions with Movies
     movies = movies.merge(descriptions_df, on="tmdbId", how="left")
 
     generate_metadata(movies, CLEAN_RATINGS_FILE) 
 
-    # ✅ Save Updated Movies Data
+    #  Save Updated Movies Data
     movies.to_csv(CLEAN_MOVIES_FILE, index=False)
 
-    # ✅ Save valid TMDb links
+    #  Save valid TMDb links
     valid_links = links[links["tmdbId"].isin(descriptions_df[descriptions_df["valid"] == True]["tmdbId"])]
     valid_links.to_csv(VALID_LINKS_FILE, index=False)
-    print(f"✅ Valid links saved at {VALID_LINKS_FILE}")
+    print(f" Valid links saved at {VALID_LINKS_FILE}")
 
-    print(f"\n✅ Movie descriptions added! Updated dataset saved at {CLEAN_MOVIES_FILE}.")
+    print(f"\n Movie descriptions added! Updated dataset saved at {CLEAN_MOVIES_FILE}.")

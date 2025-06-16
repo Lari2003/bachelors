@@ -7,7 +7,7 @@ import personIcon from './person_icon.svg';
 import SidebarProfile from './SidebarProfile';
 
 const Navbar = ({ isAuthenticated, userData, setIsAuthenticated }) => {
-  console.log("🧠 Navbar got:", { isAuthenticated, userData });
+  console.log(" Navbar got:", { isAuthenticated, userData });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 

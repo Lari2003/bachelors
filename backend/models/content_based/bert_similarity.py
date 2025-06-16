@@ -24,21 +24,21 @@ movie_ids = movies_df.index.tolist()  # Store correct mapping of IDs
 
 # Load BERT model on CPU
 device = "cpu"
-print(f"🔄 Loading BERT model on: {device.upper()}")
+print(f" Loading BERT model on: {device.upper()}")
 bert_model = SentenceTransformer("all-MiniLM-L6-v2", device=device)
 
 # **🔧 Optimized Settings**
-batch_size = 128  # ✅ Adjusted for balanced efficiency
-num_workers = 2   # ✅ Prevent CPU overload
-fp16 = False      # ✅ Full precision for best accuracy
+batch_size = 128  #  Adjusted for balanced efficiency
+num_workers = 2   #  Prevent CPU overload
+fp16 = False      #  Full precision for best accuracy
 
-# ✅ Load or Compute BERT Embeddings
+#  Load or Compute BERT Embeddings
 if os.path.exists(embeddings_path):
-    print("✅ Loading precomputed BERT embeddings...")
+    print(" Loading precomputed BERT embeddings...")
     with open(embeddings_path, "rb") as f:
         movie_embeddings = pickle.load(f)
 else:
-    print("🔄 Generating BERT embeddings in batches...")
+    print(" Generating BERT embeddings in batches...")
     movie_embeddings = []
     
     with torch.no_grad():
@@ -60,21 +60,21 @@ else:
     # Save embeddings to avoid recomputation
     with open(embeddings_path, "wb") as f:
         pickle.dump(movie_embeddings, f)
-    print(f"💾 BERT embeddings saved as '{embeddings_path}'!")
+    print(f" BERT embeddings saved as '{embeddings_path}'!")
 
-# ✅ Load or Build FAISS Index
+#  Load or Build FAISS Index
 d = movie_embeddings.shape[1]  # Embedding dimension
 if os.path.exists(faiss_index_path):
-    print("✅ Loading existing FAISS index...")
+    print(" Loading existing FAISS index...")
     index = faiss.read_index(faiss_index_path)
 else:
-    print("🔄 Building new FAISS index...")
+    print(" Building new FAISS index...")
     index = faiss.IndexFlatIP(d)  
     index.add(movie_embeddings)  
     faiss.write_index(index, faiss_index_path)
-    print(f"💾 FAISS index saved as '{faiss_index_path}'!")
+    print(f" FAISS index saved as '{faiss_index_path}'!")
 
-# ✅ Search for Similar Movies
+#  Search for Similar Movies
 K = 20  
 top_k_bertSimilarities = {}
 
@@ -82,9 +82,9 @@ print("🔍 Searching for similar movies...")
 pbar_search = tqdm(total=len(movie_embeddings), desc="Finding similar movies")
 for start in range(0, len(movie_embeddings), batch_size):
     batch = movie_embeddings[start:start + batch_size]
-    distances, indices = index.search(batch, K + 1)  # ✅ Keep raw FAISS similarity scores
+    distances, indices = index.search(batch, K + 1)  #  Keep raw FAISS similarity scores
 
-    # ✅ Store Top-K similar movies with **correct IDs**
+    #  Store Top-K similar movies with **correct IDs**
     for i, movie_idx in enumerate(range(start, min(start + batch_size, len(movie_embeddings)))):
         original_movie_id = movie_ids[movie_idx]  # Retrieve correct movieId
         top_k_bertSimilarities[original_movie_id] = [
@@ -94,9 +94,9 @@ for start in range(0, len(movie_embeddings), batch_size):
     pbar_search.update(batch_size)
 
 pbar_search.close()
-print("✅ BERT Similarities computed successfully!")
+print(" BERT Similarities computed successfully!")
 
-# ✅ Save Final Results
+#  Save Final Results
 with open(similarities_path, "wb") as f:
     pickle.dump(top_k_bertSimilarities, f)
-print(f"💾 BERT Similarity data saved as '{similarities_path}'!")
+print(f" BERT Similarity data saved as '{similarities_path}'!")

@@ -104,7 +104,7 @@ const UserPreferences = () => {
           timestamp: new Date()
         });
       } catch (err) {
-        console.error("❌ Failed to save preferences to Firestore:", err);
+        console.error(" Failed to save preferences to Firestore:", err);
       }
     }
 
@@ -126,14 +126,14 @@ const UserPreferences = () => {
             timestamp: new Date()
           });
         } catch (err) {
-          console.error("❌ Failed to save recommendation history:", err);
+          console.error(" Failed to save recommendation history:", err);
         }
       }
 
       localStorage.setItem("recommendations", JSON.stringify(data.recommendations));
       window.location.href = "/recommendations";
     } catch (err) {
-      console.error("❌ Failed to fetch recommendations:", err);
+      console.error(" Failed to fetch recommendations:", err);
     }
   };
 

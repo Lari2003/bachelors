@@ -16,9 +16,9 @@ index_to_movie_id = dict(zip(movies_df.index, movies_df["movieId"]))
 
 # Check if both similarity files exist
 if not os.path.exists(tfidf_path):
-    raise FileNotFoundError(f"❌ Error: '{tfidf_path}' not found!")
+    raise FileNotFoundError(f" Error: '{tfidf_path}' not found!")
 if not os.path.exists(bert_path):
-    raise FileNotFoundError(f"❌ Error: '{bert_path}' not found!")
+    raise FileNotFoundError(f" Error: '{bert_path}' not found!")
 
 # Load TF-IDF similarity scores
 with open(tfidf_path, "rb") as f:
@@ -58,10 +58,10 @@ for movie_index in set(tfidf_similarities.keys()).union(bert_similarities.keys()
 
     # Sort by combined score and keep top-K results
     sorted_neighbors = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:20]
-    hybrid_similarities[movie_id] = sorted_neighbors  # ✅ Save correct `movieId`
+    hybrid_similarities[movie_id] = sorted_neighbors  #  Save correct `movieId`
 
 # Save the hybrid similarity results
 with open(hybrid_path, "wb") as f:
     pickle.dump(hybrid_similarities, f)
 
-print(f"✅ Hybrid similarity model saved as '{hybrid_path}'!")
+print(f" Hybrid similarity model saved as '{hybrid_path}'!")

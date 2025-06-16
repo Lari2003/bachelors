@@ -255,7 +255,7 @@ def recommend_movies_from_plot(user_input):
     if overlap:
         print(f"[ERROR] Found excluded movies in final recommendations: {overlap}")
     else:
-        print(f"[DEBUG] ✅ No excluded movies found in final recommendations")
+        print(f"[DEBUG]  No excluded movies found in final recommendations")
     
     return recommendations[:15]
 

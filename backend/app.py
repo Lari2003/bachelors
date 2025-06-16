@@ -20,9 +20,9 @@ try:
     rating_counts = ratings_df.groupby("movieId").size().reset_index(name="rating_count")
     movies_df = movies_df.merge(rating_counts, on="movieId", how="left")
     movies_df["rating_count"].fillna(0, inplace=True)
-    print("✅ Movie data loaded successfully.")
+    print(" Movie data loaded successfully.")
 except Exception as e:
-    print("❌ Failed to load movie data:", e)
+    print(" Failed to load movie data:", e)
     movies_df = pd.DataFrame()
 
 def generate_movie_id(row):
@@ -56,7 +56,7 @@ def get_popular_movies():
     
     # Filter out movies user has already rated
     if user_feedback:
-        print(f"🚫 Filtering out {len(user_feedback)} previously rated movies")
+        print(f" Filtering out {len(user_feedback)} previously rated movies")
         filtered = filtered[~filtered["movie_id"].isin(user_feedback)]
     
     top_50 = (
@@ -67,38 +67,38 @@ def get_popular_movies():
     
     final_movies = top_50.sample(n=min(20, len(top_50))) if len(top_50) >= 20 else top_50
     
-    print(f"✅ Returning {len(final_movies)} movies after filtering")
+    print(f" Returning {len(final_movies)} movies after filtering")
     return jsonify({"movies": final_movies["title"].tolist()})
 
 @app.route("/api/all-valid-movies")
 def get_all_valid_movies():
     try:
-        print("📥 Loading movies CSV...")
+        print(" Loading movies CSV...")
         local_movies = pd.read_csv(MOVIES_PATH)
         local_movies = local_movies.dropna(subset=["poster_url"])
-        print(f"✅ Loaded {len(local_movies)} movies")
+        print(f" Loaded {len(local_movies)} movies")
 
         # Handle deleted movies
         if os.path.exists(DELETED_PATH):
-            print("📥 Loading deleted_movies.csv...")
+            print(" Loading deleted_movies.csv...")
             deleted_df = pd.read_csv(DELETED_PATH)
             excluded_ids = set(deleted_df["movie_id"].dropna())
-            print(f"🛑 Excluding {len(excluded_ids)} deleted movies")
+            print(f" Excluding {len(excluded_ids)} deleted movies")
         else:
-            print("ℹ️ deleted_movies.csv not found, skipping exclusions")
+            print("ℹ deleted_movies.csv not found, skipping exclusions")
             excluded_ids = set()
 
         # Generate movie IDs
         local_movies["movie_id"] = local_movies.apply(generate_movie_id, axis=1)
         local_movies = local_movies[~local_movies["movie_id"].isin(excluded_ids)]
 
-        print(f"✅ Returning {len(local_movies)} valid movies")
+        print(f" Returning {len(local_movies)} valid movies")
         return jsonify(local_movies[[
             "title", "genres", "year", "description", "poster_url", "movie_id"
         ]].to_dict(orient="records"))
 
     except Exception as e:
-        print("❌ Error in /api/all-valid-movies:", str(e))
+        print(" Error in /api/all-valid-movies:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/filtered-movies", methods=["POST"])
@@ -110,7 +110,7 @@ def get_filtered_movies():
         genres = data.get("genres", [])
         limit = data.get("limit", 20)
         
-        print(f"📥 Filtering movies. User has rated {len(user_feedback_ids)} movies")
+        print(f" Filtering movies. User has rated {len(user_feedback_ids)} movies")
         
         if movies_df.empty:
             return jsonify({"error": "Movie data not available"}), 500
@@ -120,7 +120,7 @@ def get_filtered_movies():
         
         # Filter out user's previously rated movies
         if user_feedback_ids:
-            print(f"🚫 Excluding {len(user_feedback_ids)} previously rated movies")
+            print(f" Excluding {len(user_feedback_ids)} previously rated movies")
             filtered_movies = filtered_movies[~filtered_movies["movie_id"].isin(user_feedback_ids)]
         
         # Filter by genres if provided
@@ -141,7 +141,7 @@ def get_filtered_movies():
             final_movies = top_movies.sample(n=limit)
         else:
             # If not enough, try to get more from all movies (regardless of genre)
-            print(f"⚠️ Only {len(top_movies)} movies found with filters, expanding search...")
+            print(f" Only {len(top_movies)} movies found with filters, expanding search...")
             all_filtered = movies_df[~movies_df["movie_id"].isin(user_feedback_ids)] if user_feedback_ids else movies_df
             additional_needed = limit - len(top_movies)
             
@@ -158,11 +158,11 @@ def get_filtered_movies():
             "title", "genres", "year", "description", "poster_url", "movie_id"
         ]].to_dict(orient="records")
         
-        print(f"✅ Returning {len(result)} filtered movies")
+        print(f" Returning {len(result)} filtered movies")
         return jsonify({"movies": result})
         
     except Exception as e:
-        print("❌ Error in /api/filtered-movies:", str(e))
+        print(" Error in /api/filtered-movies:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/delete-movie", methods=["POST"])

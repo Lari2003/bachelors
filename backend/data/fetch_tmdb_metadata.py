@@ -5,15 +5,15 @@ from tqdm import tqdm
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# ✅ TMDb API Key
+#  TMDb API Key
 TMDB_API_KEY = "b11fb8ea6a827fb6ae92bbe3e20f0965"
 
-# ✅ File paths
+#  File paths
 PROCESSED_DATA_PATH = "backend/data/processed/"
 TMDB_METADATA_CACHE = os.path.join(PROCESSED_DATA_PATH, "tmdb_metadata_cache.csv")
 INVALID_IDS_LOG = os.path.join(PROCESSED_DATA_PATH, "invalid_tmdb_ids.log")
 
-# ✅ Ensure processed folder exists
+#  Ensure processed folder exists
 os.makedirs(PROCESSED_DATA_PATH, exist_ok=True)
 
 
@@ -59,7 +59,7 @@ def fetch_metadata(movie):
 
 
 def fetch_and_cache_tmdb_metadata(valid_movies_df):
-    # ✅ Load existing cache if available
+    #  Load existing cache if available
     if os.path.exists(TMDB_METADATA_CACHE):
         metadata_cache = pd.read_csv(TMDB_METADATA_CACHE)
         fetched_ids = set(metadata_cache["tmdbId"].astype(int))
@@ -67,30 +67,30 @@ def fetch_and_cache_tmdb_metadata(valid_movies_df):
         metadata_cache = pd.DataFrame(columns=["movieId", "tmdbId", "description", "age_restriction", "poster_url"])
         fetched_ids = set()
 
-    # ✅ Filter movies that need metadata
+    #  Filter movies that need metadata
     valid_movies_df = valid_movies_df.dropna(subset=["tmdbId"])
     valid_movies_df["tmdbId"] = valid_movies_df["tmdbId"].astype(int)
 
     movies_to_fetch = valid_movies_df[~valid_movies_df["tmdbId"].isin(fetched_ids)]
-    print(f"🧠 Need to fetch metadata for {len(movies_to_fetch)} movies...")
+    print(f" Need to fetch metadata for {len(movies_to_fetch)} movies...")
 
-    # ✅ Fetch in parallel
+    # Fetch in parallel
     fetched_metadata = []
     start_time = time.time()
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = {executor.submit(fetch_metadata, row): row for _, row in movies_to_fetch.iterrows()}
-        for future in tqdm(as_completed(futures), total=len(futures), desc="🔄 Fetching TMDb metadata"):
+        for future in tqdm(as_completed(futures), total=len(futures), desc=" Fetching TMDb metadata"):
             result = future.result()
             if result:
                 fetched_metadata.append(result)
     elapsed = time.time() - start_time
-    print(f"⏱️ Fetching took {elapsed:.2f} seconds.")
+    print(f" Fetching took {elapsed:.2f} seconds.")
 
-    # ✅ Save to cache
+    # Save to cache
     if fetched_metadata:
         new_df = pd.DataFrame(fetched_metadata)
         metadata_cache = pd.concat([metadata_cache, new_df], ignore_index=True)
         metadata_cache.to_csv(TMDB_METADATA_CACHE, index=False)
 
-    print(f"✅ Metadata fetching complete. Cached: {len(metadata_cache)} entries.")
+    print(f" Metadata fetching complete. Cached: {len(metadata_cache)} entries.")
     return metadata_cache

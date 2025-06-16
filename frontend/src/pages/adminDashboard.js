@@ -11,7 +11,7 @@ function AdminDashboard() {
       await auth.signOut();
       navigate("/login");
     } catch (err) {
-      console.error("❌ Failed to logout:", err);
+      console.error(" Failed to logout:", err);
     }
   };
 

@@ -17,8 +17,8 @@ import ManageMovies from "./pages/ManageMovies";
 
 // Optional test: ensure Firestore connection works
 getDocs(collection(db, "test"))
-  .then(() => console.log("✅ Firestore working"))
-  .catch(err => console.error("❌ Firestore error:", err));
+  .then(() => console.log(" Firestore working"))
+  .catch(err => console.error(" Firestore error:", err));
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,7 +29,7 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
         if (user) {
-          console.log("✅ Firebase user detected:", user);
+          console.log(" Firebase user detected:", user);
 
           const basicUserData = {
             id: user.uid,
@@ -62,12 +62,12 @@ function App() {
             setUserData(fullUserData);
             setIsAuthenticated(true);
           } catch (firestoreError) {
-            console.warn("⚠️ Firestore error, using fallback user data:", firestoreError);
+            console.warn(" Firestore error, using fallback user data:", firestoreError);
             setUserData(basicUserData);
             setIsAuthenticated(true);
           }
         } else {
-          console.log("❌ No user logged in");
+          console.log(" No user logged in");
           setIsAuthenticated(false);
           setUserData(null);
         }
@@ -83,7 +83,7 @@ function App() {
     return unsubscribe;
   }, []);
 
-  // ✅ Safe redirect to admin
+  //  Safe redirect to admin
   useEffect(() => {
     if (!loading && isAuthenticated && userData?.isAdmin && window.location.pathname === "/") {
       window.location.href = "/admin";

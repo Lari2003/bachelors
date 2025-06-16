@@ -12,18 +12,18 @@ function ManageMovies() {
     fetch("http://localhost:5000/api/all-valid-movies")
       .then((res) => res.json())
       .then((data) => {
-        console.log("✅ fetched movies:", data);  // For debugging
+        console.log(" fetched movies:", data);  // For debugging
   
         // FIX: Only set movies if the data is a valid array
         if (Array.isArray(data)) {
           setMovies(data);
         } else {
-          console.error("❌ Unexpected response:", data);
+          console.error(" Unexpected response:", data);
           setMovies([]); // Prevent crash on .filter
         }
       })
       .catch((err) => {
-        console.error("❌ Failed to load movies:", err);
+        console.error(" Failed to load movies:", err);
         setMovies([]); // Prevent crash
       });
   }, []);  
